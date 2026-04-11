@@ -1,7 +1,8 @@
 import { PrismaClient } from "@prisma/client";
+import { Pool } from "pg";
+import { PrismaPg } from "@prisma/adapter-pg";
 
-// Automatically fix Supabase connection strings for serverless environments (Vercel).
-// Prisma requires Transaction Pooler (Port 6543) and pgbouncer=true to prevent hanging.
+// Автоматическая подмена пуллера для Vercel (исключит зависания pg)
 let dbUrl = process.env.DATABASE_URL || "";
 if (dbUrl.includes("pooler.supabase.com")) {
   dbUrl = dbUrl.replace(":5432/postgres", ":6543/postgres");
@@ -10,7 +11,7 @@ if (dbUrl.includes("pooler.supabase.com")) {
   }
 }
 
-// Fix local TLS verification for Supabase pooler 
+// Защита сертификата
 if (process.env.NODE_ENV !== "production") {
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 }
@@ -19,9 +20,15 @@ const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
 
-// Inject the corrected URL directly into the environment for this process
-process.env.DATABASE_URL = dbUrl;
+function createPrismaClient() {
+  const pool = new Pool({
+    connectionString: dbUrl,
+    ssl: { rejectUnauthorized: false },
+  });
+  const adapter = new PrismaPg(pool);
+  return new PrismaClient({ adapter }); // Обязательный параметр для вашей версии
+}
 
-export const prisma = globalForPrisma.prisma ?? new PrismaClient({});
+export const prisma = globalForPrisma.prisma ?? createPrismaClient();
 
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
