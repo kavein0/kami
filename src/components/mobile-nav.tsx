@@ -7,13 +7,13 @@ import { motion } from "framer-motion";
 
 const tabs = [
   { href: "/", icon: Home, label: "home" },
-  { href: "/browse", icon: Search, label: "browse" },
+  { href: "/browse", icon: Search, label: "catalog" },
   { href: "/feed", icon: Activity, label: "feed" },
   { href: "/my-list", icon: List, label: "myList" },
   { href: "/profile", icon: User, label: "profile" },
 ];
 
-export function MobileNav({ dict }: { dict: Record<string, string> }) {
+export function MobileNav({ dict }: { dict: Record<string, any> }) {
   const pathname = usePathname();
 
   return (
@@ -44,7 +44,7 @@ export function MobileNav({ dict }: { dict: Record<string, string> }) {
                   isActive ? "text-neon-cyan" : "text-dark-muted"
                 }`}
               >
-                {dict[tab.label] || tab.label}
+                {dict.nav?.[tab.label] || tab.label}
               </span>
             </Link>
           );

@@ -32,7 +32,7 @@ export default async function HomePage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 -mt-8 relative z-10 space-y-8">
         
         <TitleSection
-          title={dict.feed || "For You"}
+          title={dict.feed.title || "For You"}
           icon={<Sparkles className="w-6 h-6 text-neon-cyan animate-pulse-neon" />}
           titles={recommended}
           href="/browse"

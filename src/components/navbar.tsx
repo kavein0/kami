@@ -39,10 +39,10 @@ export function Navbar({ lang, dict }: { lang: string, dict: Record<string, stri
   }, []);
 
   const navLinks = [
-    { href: "/", label: dict.home, icon: Home },
-    { href: "/browse", label: dict.catalog, icon: Search },
-    { href: "/feed", label: dict.feed, icon: Sparkles },
-    { href: "/my-list", label: dict.myList, icon: List },
+    { href: "/", label: dict.nav.home, icon: Home },
+    { href: "/browse", label: dict.nav.catalog, icon: Search },
+    { href: "/feed", label: dict.nav.feed, icon: Sparkles },
+    { href: "/my-list", label: dict.nav.myList, icon: List },
   ];
 
   return (
