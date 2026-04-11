@@ -81,7 +81,7 @@ export function TitleCard({ title, index = 0 }: TitleCardProps) {
 
           {/* Info */}
           <div className="p-4 space-y-2 relative z-10 glass-strong m-2 rounded-xl mt-[-20px] transition-transform duration-300 group-hover:-translate-y-2">
-            <h3 className="font-bold font-heading text-lg text-white leading-tight line-clamp-1 group-hover:text-neon-cyan transition-colors duration-300 neon-text-cyan">
+            <h3 className="font-bold font-heading text-lg text-white leading-tight line-clamp-1 group-hover:text-neon-cyan transition-colors duration-300">
               {title.name}
             </h3>
             {title.nameEn && (
