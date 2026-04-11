@@ -28,6 +28,9 @@ function createPrismaClient() {
   const pool = new Pool({
     connectionString: dbUrl,
     ssl: { rejectUnauthorized: false },
+    max: 1, // Required for Vercel Serverless
+    allowExitOnIdle: true, // Prevents event loop hangs when freezing
+    connectionTimeoutMillis: 5000,
   });
   const adapter = new PrismaPg(pool);
   return new PrismaClient({ adapter }); // Обязательный параметр для вашей версии
