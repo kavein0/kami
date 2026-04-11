@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Outfit } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/navbar";
 import { MobileNav } from "@/components/mobile-nav";
@@ -8,7 +8,8 @@ import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { DictionaryProvider } from "@/components/dictionary-provider";
 
-const inter = Inter({ subsets: ["latin", "cyrillic"] });
+const inter = Inter({ subsets: ["latin", "cyrillic"], variable: "--font-inter" });
+const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
 
 export async function generateMetadata(): Promise<Metadata> {
   const lang = await getLanguage();
@@ -37,7 +38,7 @@ export default async function RootLayout({
 
   return (
     <html lang={lang} className="dark" suppressHydrationWarning>
-      <body className={`${inter.className} antialiased bg-dark-bg min-h-screen`} suppressHydrationWarning>
+      <body className={`${inter.variable} ${outfit.variable} font-sans antialiased bg-dark-bg min-h-screen`} suppressHydrationWarning>
         <DictionaryProvider dict={dict}>
           <Navbar lang={lang} dict={dict.nav} />
           <main className="pb-20 md:pb-0">{children}</main>

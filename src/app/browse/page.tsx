@@ -55,13 +55,26 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
     if (tab === "anime") {
         fetchType = "tv";
         isAnime = true;
-        genreConfig = ANIME_GENRES.find((g) => g.name === genre);
+        
+        if (genre) {
+          const names = genre.split(",");
+          const ids = names.map(n => ANIME_GENRES.find(g => g.name === n?.trim())?.id).filter(Boolean);
+          if (ids.length > 0) genreConfig = { id: ids.join("|"), name: genre, type: "genre" }; // Pipe means OR
+        }
     } else if (tab === "series") {
         fetchType = "tv";
-        genreConfig = SERIES_GENRES.find((g) => g.name === genre);
+        if (genre) {
+          const names = genre.split(",");
+          const ids = names.map(n => SERIES_GENRES.find(g => g.name === n?.trim())?.id).filter(Boolean);
+          if (ids.length > 0) genreConfig = { id: ids.join("|"), name: genre, type: "genre" };
+        }
     } else {
         fetchType = "movie";
-        genreConfig = MOVIE_GENRES.find((g) => g.name === genre);
+        if (genre) {
+          const names = genre.split(",");
+          const ids = names.map(n => MOVIE_GENRES.find(g => g.name === n?.trim())?.id).filter(Boolean);
+          if (ids.length > 0) genreConfig = { id: ids.join("|"), name: genre, type: "genre" };
+        }
     }
 
     const sortConfig = 
@@ -141,6 +154,7 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
                 paramKey="genre"
                 currentValue={genre || ""}
                 defaultLabel={dict.browse.filterAny}
+                multiSelect={true}
                 options={currentTabObj.genres.map((g) => ({
                   label: g.name,
                   value: g.name,

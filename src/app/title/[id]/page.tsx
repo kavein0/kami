@@ -15,13 +15,33 @@ export async function generateMetadata({ params }: TitlePageProps): Promise<Meta
   const title = await getTitleDetail(id);
   if (!title) return { title: "Not Found — KamiList" };
 
+  const baseUrl = process.env.NEXTAUTH_URL || "https://kamilist.vercel.app";
+  const ogImageUrl = new URL("/api/og", baseUrl);
+  ogImageUrl.searchParams.set("title", title.name);
+  if (title.backdrop || title.poster) {
+    ogImageUrl.searchParams.set("image", title.backdrop || title.poster || "");
+  }
+
   return {
     title: `${title.name} — KamiList`,
     description: title.description || `${title.name} on KamiList`,
     openGraph: {
       title: `${title.name} — KamiList`,
       description: title.description || undefined,
-      images: title.poster ? [{ url: title.poster }] : undefined,
+      images: [
+        {
+          url: ogImageUrl.toString(),
+          width: 1200,
+          height: 630,
+          alt: title.name,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${title.name} — KamiList`,
+      description: title.description || undefined,
+      images: [ogImageUrl.toString()],
     },
   };
 }
@@ -58,6 +78,22 @@ export default async function TitlePage({ params }: TitlePageProps) {
 
   const dict = await getDictionary();
 
+  // Enirch Anime with Jikan (MyAnimeList API) Data
+  let malScore: number | null = null;
+  if (title.type === "anime") {
+    try {
+      const res = await fetch(`https://api.jikan.moe/v4/anime?q=${encodeURIComponent(title.nameEn || title.name)}&limit=1`, {
+        next: { revalidate: 3600 }
+      });
+      const data = await res.json();
+      if (data.data && data.data.length > 0 && data.data[0].score) {
+        malScore = data.data[0].score;
+      }
+    } catch (e) {
+      console.error("Failed to fetch from Jikan", e);
+    }
+  }
+
   return (
     <TitleDetailClient
       title={title}
@@ -66,6 +102,7 @@ export default async function TitlePage({ params }: TitlePageProps) {
       isLoggedIn={!!session?.user}
       reviews={reviews}
       dict={dict}
+      malScore={malScore}
     />
   );
 }

@@ -17,6 +17,7 @@ interface DropdownFilterProps {
   paramKey: string;
   defaultLabel?: string;
   icon?: React.ReactNode;
+  multiSelect?: boolean;
 }
 
 export function DropdownFilter({
@@ -26,6 +27,7 @@ export function DropdownFilter({
   paramKey,
   defaultLabel = "Все",
   icon,
+  multiSelect = false,
 }: DropdownFilterProps) {
   const [isOpen, setIsOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -43,22 +45,45 @@ export function DropdownFilter({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  const currentValuesArray = currentValue ? currentValue.split(",") : [];
+
   const handleSelect = (value: string) => {
     const params = new URLSearchParams(searchParams.toString());
-    if (value) {
-      params.set(paramKey, value);
+    
+    if (multiSelect) {
+      if (!value) {
+        // Clear all
+        params.delete(paramKey);
+        setIsOpen(false);
+      } else {
+        let newValues = [...currentValuesArray];
+        if (newValues.includes(value)) {
+          newValues = newValues.filter(v => v !== value);
+        } else {
+          newValues.push(value);
+        }
+        
+        if (newValues.length > 0) {
+          params.set(paramKey, newValues.join(","));
+        } else {
+          params.delete(paramKey);
+        }
+      }
     } else {
-      params.delete(paramKey);
+      if (value) {
+        params.set(paramKey, value);
+      } else {
+        params.delete(paramKey);
+      }
+      setIsOpen(false);
     }
     
-    // Removing search query when heavily interacting with genre filters is usually good practice,
-    // though optional. Let's keep existing search query parameters to not wipe user's intent.
     router.push(`${pathname}?${params.toString()}`, { scroll: false });
-    setIsOpen(false);
   };
 
-  const activeOption = options.find((o) => o.value === currentValue);
-  const displayLabel = activeOption ? activeOption.label : defaultLabel;
+  const displayLabel = multiSelect 
+    ? (currentValuesArray.length > 0 ? `${currentValuesArray.length} выбрано` : defaultLabel)
+    : (options.find((o) => o.value === currentValue)?.label || defaultLabel);
 
   return (
     <div className="relative" ref={ref}>
@@ -71,8 +96,8 @@ export function DropdownFilter({
         }`}
       >
         {icon && <span className="transition-transform">{icon}</span>}
-        <span className="hidden sm:inline-block mr-1 opacity-70">{label}:</span>
-        <span className="font-semibold text-dark-text">{displayLabel}</span>
+        <span className="hidden sm:inline-block mr-1 opacity-70 flex-shrink-0">{label}:</span>
+        <span className="font-semibold text-dark-text truncate max-w-[120px] sm:max-w-none">{displayLabel}</span>
         <motion.div animate={{ rotate: isOpen ? 180 : 0 }}>
           <ChevronDown className="w-4 h-4 ml-1 opacity-70" />
         </motion.div>
@@ -85,7 +110,7 @@ export function DropdownFilter({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.95 }}
             transition={{ duration: 0.15 }}
-            className="absolute z-50 left-0 mt-2 w-56 p-1.5 rounded-2xl glass-strong border border-dark-border shadow-xl shadow-black/40 max-h-[300px] overflow-y-auto hide-scrollbar"
+            className="absolute z-50 left-0 mt-2 w-56 p-1.5 rounded-2xl glass-strong border border-dark-border shadow-[0_10px_40px_rgba(0,0,0,0.8)] max-h-[400px] overflow-y-auto scrollbar-thin"
           >
             <button
               onClick={() => handleSelect("")}
@@ -98,21 +123,29 @@ export function DropdownFilter({
               {defaultLabel}
               {!currentValue && <Check className="w-4 h-4" />}
             </button>
+            
             <div className="mt-1 space-y-0.5">
               {options.map((option) => {
-                const isActive = currentValue === option.value;
+                const isActive = multiSelect 
+                  ? currentValuesArray.includes(option.value)
+                  : currentValue === option.value;
+                  
                 return (
                   <button
                     key={option.value}
                     onClick={() => handleSelect(option.value)}
-                    className={`w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium transition-colors flex items-center justify-between ${
+                    className={`w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium transition-colors flex items-center justify-between group ${
                       isActive
                         ? "bg-neon-cyan/20 text-neon-cyan"
                         : "text-dark-muted hover:text-dark-text hover:bg-dark-hover"
                     }`}
                   >
                     {option.label}
-                    {isActive && <Check className="w-4 h-4" />}
+                    {isActive ? (
+                      <Check className="w-4 h-4 text-neon-cyan" />
+                    ) : multiSelect ? (
+                      <div className="w-4 h-4 border border-dark-border rounded bg-dark-bg group-hover:border-neon-cyan/50" />
+                    ) : null}
                   </button>
                 );
               })}

@@ -126,6 +126,9 @@ export async function getPopularTitles(
   if (filterAnime && type === "tv") {
     params["with_original_language"] = "ja";
     combinedGenres = "16"; // Base animation genre required
+  } else if (!filterAnime && type === "tv") {
+    // Exclude animation and Japanese origin completely to ensure Western/Live-action series only
+    params["without_genres"] = "16";
   }
 
   if (genreId) {

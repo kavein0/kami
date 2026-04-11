@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { logoutAction, setLanguage } from "@/app/actions";
+import { GlobalSearch } from "./global-search";
 
 export function Navbar({ lang, dict }: { lang: string, dict: Record<string, string> }) {
   const pathname = usePathname();
@@ -98,7 +99,8 @@ export function Navbar({ lang, dict }: { lang: string, dict: Record<string, stri
           </nav>
 
           {/* Right side */}
-          <div className="hidden md:flex items-center gap-3">
+          <div className="hidden md:flex items-center gap-3 relative">
+            <GlobalSearch />
             <button
                onClick={() => setLanguage(lang === 'ru' ? 'en' : 'ru')}
                className="flex items-center justify-center font-bold text-xs w-8 h-8 rounded-full border border-dark-border text-dark-muted hover:text-neon-cyan hover:border-neon-cyan transition-colors"

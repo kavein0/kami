@@ -10,6 +10,7 @@ import { cookies } from "next/headers";
 import { getTitleDetail, searchTitles, getPopularTitles } from "@/lib/tmdb";
 import { ANIME_GENRES, MOVIE_GENRES, SERIES_GENRES, GenreConfig } from "@/lib/types";
 import { getDictionary } from "@/lib/i18n";
+import emailValidator from "deep-email-validator";
 
 // ===== HELPERS =====
 
@@ -56,6 +57,24 @@ export async function registerAction(formData: FormData) {
 
   if (password.length < 6) {
     return { error: dict.auth.passwordMin };
+  }
+
+  // Validate email thoroughly (MX records, typos, disposable domains)
+  try {
+    const emailValidation = await emailValidator({
+      email,
+      validateRegex: true,
+      validateMx: true,
+      validateTypo: true,
+      validateDisposable: true,
+      validateSMTP: false, // SMTP checks are too slow and often blocked by Vercel
+    });
+    if (!emailValidation.valid) {
+      return { error: "Invalid or disposable email address detected." }; // Will use dict.auth.errorEmailInvalid if added to i18n
+    }
+  } catch (err) {
+    console.error("Email validation warning:", err);
+    // Proceed if validation tool fails network request
   }
 
   // Check unique name and email
@@ -291,20 +310,30 @@ export async function loadMoreTitles(params: {
     if (tab === "movie") titles = titles.filter(t => t.type === "movie");
     if (tab === "series") titles = titles.filter(t => t.type === "series");
   } else {
-    let genreConfig: GenreConfig | undefined;
+    // Determine fetch parameters based on tab selection
+    let genreConfig: { id: string | number; type: string } | undefined;
     let fetchType: "tv" | "movie" = "movie";
     let isAnime = false;
 
     if (tab === "anime") {
         fetchType = "tv";
         isAnime = true;
-        genreConfig = ANIME_GENRES.find(g => g.name === genre);
+        if (genre) {
+          const ids = genre.split(",").map(n => ANIME_GENRES.find(g => g.name === n?.trim())?.id).filter(Boolean);
+          if (ids.length > 0) genreConfig = { id: ids.join("|"), type: "genre" };
+        }
     } else if (tab === "series") {
         fetchType = "tv";
-        genreConfig = SERIES_GENRES.find(g => g.name === genre);
+        if (genre) {
+          const ids = genre.split(",").map(n => SERIES_GENRES.find(g => g.name === n?.trim())?.id).filter(Boolean);
+          if (ids.length > 0) genreConfig = { id: ids.join("|"), type: "genre" };
+        }
     } else { 
         fetchType = "movie";
-        genreConfig = MOVIE_GENRES.find(g => g.name === genre);
+        if (genre) {
+          const ids = genre.split(",").map(n => MOVIE_GENRES.find(g => g.name === n?.trim())?.id).filter(Boolean);
+          if (ids.length > 0) genreConfig = { id: ids.join("|"), type: "genre" };
+        }
     }
 
     const sortConfig = 
@@ -315,8 +344,8 @@ export async function loadMoreTitles(params: {
     const res = await getPopularTitles(fetchType, {
         filterAnime: isAnime,
         page,
-        genreId: genreConfig?.type === "genre" ? genreConfig.id : undefined,
-        keywordId: genreConfig?.type === "keyword" ? genreConfig.id : undefined,
+        genreId: genreConfig?.type === "genre" ? genreConfig.id as any : undefined,
+        keywordId: genreConfig?.type === "keyword" ? genreConfig.id as any : undefined,
         sortBy: sortConfig,
     });
     titles = res.results;

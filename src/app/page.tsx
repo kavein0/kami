@@ -1,26 +1,42 @@
 import { getPopularTitles } from "@/lib/tmdb";
 import { HeroBanner } from "@/components/hero-banner";
 import { TitleSection } from "@/components/title-section";
-import { Flame, TrendingUp, Clapperboard } from "lucide-react";
+import { Flame, TrendingUp, Clapperboard, Sparkles } from "lucide-react";
 import { getDictionary } from "@/lib/i18n";
+import { ClientPageTransition } from "@/components/client-page-transition";
+import { auth } from "@/lib/auth";
+import { getPersonalizedRecommendations } from "@/lib/recommendations";
 
 export default async function HomePage() {
-  const { results: topAnime } = await getPopularTitles("tv", { filterAnime: true, sortBy: "vote_average.desc" });
-  const { results: topMovies } = await getPopularTitles("movie", { sortBy: "vote_average.desc" });
-  const { results: topSeries } = await getPopularTitles("tv", { sortBy: "vote_average.desc" });
+  const session = await auth();
+  const recommended = await getPersonalizedRecommendations(session?.user?.id);
+
+  const { results: topAnime } = await getPopularTitles("tv", { filterAnime: true, sortBy: "popularity.desc", page: 1 });
+  const { results: topMovies } = await getPopularTitles("movie", { sortBy: "popularity.desc", page: 1 });
+  const { results: topSeries } = await getPopularTitles("tv", { sortBy: "popularity.desc", filterAnime: false, page: 1 });
 
   const dict = await getDictionary();
 
-  // Pick hero title from popular anime
-  const heroTitle = topAnime[0];
+  // Anime of the day logic (Changes randomly based on current day numerical value)
+  const currentDaySeed = new Date().getDate() + new Date().getMonth();
+  const randomIndex = currentDaySeed % Math.max(topAnime.length, 1);
+  const heroTitle = topAnime[randomIndex] || topAnime[0];
 
   return (
-    <div className="min-h-screen">
-      {/* Hero Section */}
-      {heroTitle && <HeroBanner title={heroTitle} />}
+    <ClientPageTransition>
+      <div className="min-h-screen">
+        {/* Hero Section */}
+        {heroTitle && <HeroBanner title={heroTitle} />}
 
       {/* Content Sections */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 -mt-8 relative z-10 space-y-4">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 -mt-8 relative z-10 space-y-8">
+        
+        <TitleSection
+          title={dict.feed || "For You"}
+          icon={<Sparkles className="w-6 h-6 text-neon-cyan animate-pulse-neon" />}
+          titles={recommended}
+          href="/browse"
+        />
         <TitleSection
           title={dict.home.popularAnime}
           icon={<Flame className="w-6 h-6 text-neon-pink" />}
@@ -73,15 +89,16 @@ export default async function HomePage() {
         </section>
 
         {/* Footer */}
-        <footer className="border-t border-dark-border py-8 text-center">
-          <p className="text-dark-muted text-sm">
-            © {new Date().getFullYear()} <span className="text-neon-cyan font-semibold">KamiList</span>. {dict.home.footerRights}
+        <footer className="border-t border-dark-border py-8 text-center mt-20 relative z-10 glass-strong rounded-t-3xl border-b-0">
+          <p className="text-dark-muted text-sm tracking-wide">
+            © {new Date().getFullYear()} <span className="text-neon-cyan font-semibold font-heading tracking-wider">KamiList</span>. {dict.home.footerRights}
           </p>
-          <p className="text-dark-muted/50 text-xs mt-2">
+          <p className="text-dark-muted/50 text-xs mt-2 uppercase tracking-widest font-semibold">
             {dict.home.footerNote}
           </p>
         </footer>
       </div>
-    </div>
+      </div>
+    </ClientPageTransition>
   );
 }

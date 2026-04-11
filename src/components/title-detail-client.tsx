@@ -21,6 +21,10 @@ import { StatusButtons } from "@/components/status-buttons";
 import { submitReview } from "@/app/actions";
 import { TitleCard } from "@/components/title-card";
 import type { TitleData } from "@/lib/types";
+import { NEON_BLUR_BASE64 } from "@/lib/image-utils";
+import { ClientPageTransition } from "@/components/client-page-transition";
+import { useRef } from "react";
+import { useScroll, useTransform } from "framer-motion";
 
 interface TitleDetailClientProps {
   title: TitleData;
@@ -35,6 +39,7 @@ interface TitleDetailClientProps {
     user: { id: string; name: string | null; image: string | null };
   }>;
   dict: any;
+  malScore?: number | null;
 }
 
 export function TitleDetailClient({
@@ -44,6 +49,7 @@ export function TitleDetailClient({
   isLoggedIn,
   reviews = [],
   dict,
+  malScore,
 }: TitleDetailClientProps) {
   const genres = title.genres ? title.genres.split(",") : [];
   const [reviewText, setReviewText] = useState("");
@@ -59,6 +65,13 @@ export function TitleDetailClient({
     });
   };
 
+  const ref = useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start start", "end start"],
+  });
+  const y = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
+
   let youtubeId: string | null = null;
   try {
     if (title.trailer) {
@@ -69,21 +82,31 @@ export function TitleDetailClient({
   }
 
   return (
-    <div className="min-h-screen">
+    <ClientPageTransition>
+    <div className="min-h-screen" ref={ref}>
       {/* Backdrop */}
-      <div className="relative w-full h-[40vh] md:h-[60vh] overflow-hidden">
-        <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{
-            backgroundImage: title.backdrop
-              ? `url(${title.backdrop})`
-              : title.poster
-              ? `url(${title.poster})`
-              : "linear-gradient(135deg, #1a1a2e, #0a0a0f)",
-          }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-dark-bg via-dark-bg/60 to-dark-bg/30" />
-        <div className="absolute inset-0 bg-gradient-to-r from-dark-bg/70 via-transparent to-transparent" />
+      <div className="relative w-full h-[40vh] md:h-[60vh] overflow-hidden bg-dark-bg object-cover">
+        <motion.div
+           style={{ y }}
+           className="absolute inset-0 w-full h-[120%] -top-[10%]"
+        >
+          {title.backdrop || title.poster ? (
+             <Image
+                src={title.backdrop || title.poster || ""}
+                alt={`${title.name} backdrop`}
+                fill
+                priority
+                className="object-cover opacity-60"
+                sizes="100vw"
+                placeholder="blur"
+                blurDataURL={NEON_BLUR_BASE64}
+             />
+          ) : (
+            <div className="w-full h-full bg-gradient-to-br from-dark-card to-dark-bg" />
+          )}
+        </motion.div>
+        <div className="absolute inset-0 bg-gradient-to-t from-dark-bg via-dark-bg/80 to-dark-bg/20" />
+        <div className="absolute inset-0 md:bg-gradient-to-r from-dark-bg via-dark-bg/60 to-transparent" />
 
         {/* Back button */}
         <motion.div
@@ -111,15 +134,21 @@ export function TitleDetailClient({
             transition={{ duration: 0.6 }}
             className="shrink-0"
           >
-            <div className="w-48 sm:w-56 md:w-64 rounded-2xl overflow-hidden shadow-2xl shadow-black/50 border border-dark-border neon-glow-cyan mx-auto md:mx-0">
-              <div
-                className="w-full aspect-[2/3] bg-cover bg-center"
-                style={{
-                  backgroundImage: title.poster
-                    ? `url(${title.poster})`
-                    : "linear-gradient(135deg, #1a1a2e, #12121a)",
-                }}
-              />
+            <div className="w-48 sm:w-56 md:w-64 aspect-[2/3] relative rounded-2xl overflow-hidden shadow-2xl shadow-black/50 border border-dark-border shadow-[0_0_30px_rgba(0,240,255,0.2)] mx-auto md:mx-0 bg-dark-surface">
+              {title.poster ? (
+                 <Image
+                   src={title.poster}
+                   alt={title.name}
+                   fill
+                   priority
+                   sizes="(max-width: 640px) 192px, (max-width: 768px) 224px, 256px"
+                   className="object-cover"
+                   placeholder="blur"
+                   blurDataURL={NEON_BLUR_BASE64}
+                 />
+              ) : (
+                <div className="w-full h-full bg-gradient-to-br from-dark-surface to-dark-border" />
+              )}
             </div>
           </motion.div>
 
@@ -145,7 +174,7 @@ export function TitleDetailClient({
                     : (dict.browse.tabSeries || "Series")}
                 </span>
               </div>
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-tight">
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold font-heading text-white leading-tight">
                 {title.name}
               </h1>
               {title.nameEn && (
@@ -156,10 +185,18 @@ export function TitleDetailClient({
             {/* Meta info */}
             <div className="flex flex-wrap items-center gap-4 text-sm">
               {title.rating && (
-                <div className="flex items-center gap-1.5 px-3 py-2 rounded-xl glass">
+                <div className="flex items-center gap-1.5 px-3 py-2 rounded-xl glass" title="TMDB Score">
                   <Star className="w-4 h-4 text-neon-yellow fill-neon-yellow" />
                   <span className="font-bold text-neon-yellow">
                     {title.rating.toFixed(1)}
+                  </span>
+                </div>
+              )}
+              {malScore && (
+                <div className="flex items-center gap-1.5 px-3 py-2 rounded-xl glass border-blue-500/50" title="MyAnimeList Score">
+                  <span className="font-black text-[10px] text-blue-400 uppercase tracking-widest leading-none mt-[2px]">MAL</span>
+                  <span className="font-bold text-blue-400">
+                    {malScore.toFixed(2)}
                   </span>
                 </div>
               )}
@@ -345,5 +382,6 @@ export function TitleDetailClient({
         </section>
       </div>
     </div>
+    </ClientPageTransition>
   );
 }
