@@ -1,4 +1,5 @@
 import { getPopularTitles } from "@/lib/tmdb";
+import { getPopularAnime } from "@/lib/jikan";
 import { HeroBanner } from "@/components/hero-banner";
 import { TitleSection } from "@/components/title-section";
 import { Flame, TrendingUp, Clapperboard, Sparkles } from "lucide-react";
@@ -11,7 +12,7 @@ export default async function HomePage() {
   const session = await auth();
   const recommended = await getPersonalizedRecommendations(session?.user?.id);
 
-  const { results: topAnime } = await getPopularTitles("tv", { filterAnime: true, sortBy: "popularity.desc", page: 1 });
+  const { results: topAnime } = await getPopularAnime({ sortBy: "members", page: 1 });
   const { results: topMovies } = await getPopularTitles("movie", { sortBy: "popularity.desc", page: 1 });
   const { results: topSeries } = await getPopularTitles("tv", { sortBy: "popularity.desc", filterAnime: false, page: 1 });
 

@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { getTitleDetail, getSimilarTitles } from "@/lib/tmdb";
+import { getAnimeDetail, getSimilarAnime } from "@/lib/jikan";
 import { auth } from "@/lib/auth";
 import { notFound } from "next/navigation";
 import { TitleDetailClient } from "@/components/title-detail-client";
@@ -12,7 +13,12 @@ interface TitlePageProps {
 
 export async function generateMetadata({ params }: TitlePageProps): Promise<Metadata> {
   const { id } = await params;
-  const title = await getTitleDetail(id);
+  let title;
+  if (id.startsWith("jikan_") || id.startsWith("anime_")) {
+    title = await getAnimeDetail(id);
+  } else {
+    title = await getTitleDetail(id);
+  }
   if (!title) return { title: "Not Found — KamiList" };
 
   const baseUrl = process.env.NEXTAUTH_URL || "https://kamilist.vercel.app";
@@ -50,7 +56,12 @@ export default async function TitlePage({ params }: TitlePageProps) {
   const { id } = await params;
   const session = await auth();
 
-  const title = await getTitleDetail(id);
+  let title;
+  if (id.startsWith("jikan_") || id.startsWith("anime_")) {
+    title = await getAnimeDetail(id);
+  } else {
+    title = await getTitleDetail(id);
+  }
 
   if (!title) notFound();
 
@@ -67,7 +78,12 @@ export default async function TitlePage({ params }: TitlePageProps) {
   }
 
   // Get similar titles (same type or genres)
-  const similarTitles = await getSimilarTitles(id);
+  let similarTitles = [];
+  if (id.startsWith("jikan_") || id.startsWith("anime_")) {
+    similarTitles = await getSimilarAnime(id);
+  } else {
+    similarTitles = await getSimilarTitles(id);
+  }
 
   // Get reviews
   const reviews = await prisma.review.findMany({
@@ -78,21 +94,8 @@ export default async function TitlePage({ params }: TitlePageProps) {
 
   const dict = await getDictionary();
 
-  // Enirch Anime with Jikan (MyAnimeList API) Data
-  let malScore: number | null = null;
-  if (title.type === "anime") {
-    try {
-      const res = await fetch(`https://api.jikan.moe/v4/anime?q=${encodeURIComponent(title.nameEn || title.name)}&limit=1`, {
-        next: { revalidate: 3600 }
-      });
-      const data = await res.json();
-      if (data.data && data.data.length > 0 && data.data[0].score) {
-        malScore = data.data[0].score;
-      }
-    } catch (e) {
-      console.error("Failed to fetch from Jikan", e);
-    }
-  }
+  // Fallback map legacy score extraction to malScore so old components don't visually break
+  const malScore = title.type === "anime" ? title.rating : null;
 
   return (
     <TitleDetailClient
