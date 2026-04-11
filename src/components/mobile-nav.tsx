@@ -44,7 +44,7 @@ export function MobileNav({ dict }: { dict: Record<string, any> }) {
                   isActive ? "text-neon-cyan" : "text-dark-muted"
                 }`}
               >
-                {dict.nav?.[tab.label] || tab.label}
+                {dict[tab.label] || tab.label}
               </span>
             </Link>
           );
