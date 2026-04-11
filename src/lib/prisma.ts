@@ -11,6 +11,10 @@ if (dbUrl.includes("pooler.supabase.com")) {
   }
 }
 
+// Убираем sslmode=require из строки, так как пакет pg интерпретирует это 
+// как строгую проверку сертификата (verify-full), игнорируя наши настройки.
+dbUrl = dbUrl.replace("?sslmode=require", "").replace("&sslmode=require", "");
+
 // Защита сертификата
 if (process.env.NODE_ENV !== "production") {
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
