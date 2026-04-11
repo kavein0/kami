@@ -28,10 +28,8 @@ if (dbUrl.includes("pooler.supabase.com")) {
   }
 }
 
-// Защита сертификата
-if (process.env.NODE_ENV !== "production") {
-  process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-}
+// Защита сертификата (важно для Supabase / Vercel Serverless в некоторых регионах)
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
