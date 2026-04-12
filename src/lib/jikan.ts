@@ -66,6 +66,32 @@ export function normalizeJikanTitle(item: any): TitleData {
   };
 }
 
+// ==================== KITSU (High-Res Cover Images) ====================
+
+/**
+ * Fetch a high-resolution cover image from Kitsu API for hero banners.
+ * Returns a wide cover image (3360x800 at "large" size) instead of tiny MAL posters.
+ */
+export async function fetchKitsuCover(animeName: string): Promise<string | null> {
+  try {
+    const url = `https://kitsu.app/api/edge/anime?filter[text]=${encodeURIComponent(animeName)}&page[limit]=1&fields[anime]=coverImage`;
+    const res = await fetch(url, {
+      next: { revalidate: 86400 } // 24h cache
+    });
+    
+    if (!res.ok) return null;
+    const data = await res.json();
+    
+    const cover = data?.data?.[0]?.attributes?.coverImage;
+    if (!cover) return null;
+    
+    // Prefer large (3360x800), fallback to small (1680x400), then original
+    return cover.large || cover.small || cover.original || null;
+  } catch {
+    return null;
+  }
+}
+
 // ==================== SHIKIMORI (Russian Localization) ====================
 
 const SHIKIMORI_BASE = "https://shikimori.one";

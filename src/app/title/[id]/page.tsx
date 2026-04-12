@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { getTitleDetail, getSimilarTitles } from "@/lib/tmdb";
-import { getAnimeDetail, getSimilarAnime } from "@/lib/jikan";
+import { getAnimeDetail, getSimilarAnime, fetchKitsuCover } from "@/lib/jikan";
 import { auth } from "@/lib/auth";
 import { notFound } from "next/navigation";
 import { TitleDetailClient } from "@/components/title-detail-client";
@@ -64,6 +64,14 @@ export default async function TitlePage({ params }: TitlePageProps) {
   }
 
   if (!title) notFound();
+
+  // Enrich anime with Kitsu high-res cover for the detail header
+  if (title.type === "anime") {
+    const kitsuCover = await fetchKitsuCover(title.nameEn || title.name);
+    if (kitsuCover) {
+      title = { ...title, backdrop: kitsuCover };
+    }
+  }
 
   let userEntry = null;
   if (session?.user?.id) {

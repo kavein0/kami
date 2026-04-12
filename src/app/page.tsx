@@ -1,5 +1,5 @@
 import { getPopularTitles } from "@/lib/tmdb";
-import { getPopularAnime } from "@/lib/jikan";
+import { getPopularAnime, fetchKitsuCover } from "@/lib/jikan";
 import { HeroBanner } from "@/components/hero-banner";
 import { TitleSection } from "@/components/title-section";
 import { Flame, TrendingUp, Clapperboard, Sparkles } from "lucide-react";
@@ -29,7 +29,15 @@ export default async function HomePage() {
 
   // Pick an index within that page based on the day
   const heroIndex = daysSinceEpoch % Math.max(heroPool.length, 1);
-  const heroTitle = heroPool[heroIndex] || topAnime[0];
+  let heroTitle = heroPool[heroIndex] || topAnime[0];
+
+  // Enrich hero with high-res Kitsu cover image (3360x800) for the banner
+  if (heroTitle) {
+    const kitsuCover = await fetchKitsuCover(heroTitle.nameEn || heroTitle.name);
+    if (kitsuCover) {
+      heroTitle = { ...heroTitle, backdrop: kitsuCover };
+    }
+  }
 
   return (
     <ClientPageTransition>
