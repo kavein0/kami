@@ -211,11 +211,6 @@ export const dictionaries = {
       "Survival": "Survival",
       "Time Travel": "Time Travel",
       // Jikan demographics
-      "Shounen": "Shounen",
-      "Shoujo": "Shoujo",
-      "Seinen": "Seinen",
-      "Josei": "Josei",
-      "Kids": "Kids",
     },
     genreDescriptions: {
       "Action": "Dynamic scenes, battles, and non-stop action.",

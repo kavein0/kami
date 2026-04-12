@@ -100,29 +100,10 @@ export function TitleCard({ title, index = 0 }: TitleCardProps) {
                   if (!clean) return null;
                   const localized = dict.genres[clean] || clean;
                   
-                  let defaultDesc = "";
-                  if (title.type === "anime") {
-                     defaultDesc = ANIME_GENRES.find(g => g.name === clean)?.description || "";
-                  } else if (title.type === "movie") {
-                     defaultDesc = MOVIE_GENRES.find(g => g.name === clean)?.description || "";
-                  } else {
-                     defaultDesc = SERIES_GENRES.find(g => g.name === clean)?.description || "";
-                  }
-                  
-                  const description = dict.genreDescriptions?.[clean] || defaultDesc;
-
-                  const genrePill = (
-                    <span className="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-dark-bg text-dark-muted border border-dark-border cursor-help hover:text-neon-cyan hover:border-neon-cyan/50 transition-colors">
+                  return (
+                    <span key={clean} className="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-dark-bg text-dark-muted border border-dark-border transition-colors hover:text-neon-cyan hover:border-neon-cyan/50">
                       {localized}
                     </span>
-                  );
-
-                  return description ? (
-                    <GenreTooltip key={clean} description={description}>
-                      {genrePill}
-                    </GenreTooltip>
-                  ) : (
-                    <span key={clean}>{genrePill}</span>
                   );
                 })}
               </div>
