@@ -25,10 +25,10 @@ export function TitleCard({ title, index = 0 }: TitleCardProps) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: index * 0.05 }}
       whileHover={{ y: -8, transition: { duration: 0.3 } }}
-      className="group"
+      className="group h-full"
     >
-      <Link href={`/title/${title.id}`}>
-        <div className="relative rounded-2xl overflow-hidden bg-dark-card border border-dark-border hover:border-neon-cyan/30 shadow-[0_4px_20px_rgba(0,0,0,0.5)] hover:shadow-[0_0_20px_rgba(0,240,255,0.4)] transition-all duration-500 card-shine">
+      <Link href={`/title/${title.id}`} className="block h-full">
+        <div className="h-full flex flex-col relative rounded-2xl overflow-hidden bg-dark-card border border-dark-border hover:border-neon-cyan/30 shadow-[0_4px_20px_rgba(0,0,0,0.5)] hover:shadow-[0_0_20px_rgba(0,240,255,0.4)] transition-all duration-500 card-shine">
           {/* Poster */}
           <div className="relative aspect-[2/3] overflow-hidden">
             {title.poster ? (
@@ -46,17 +46,6 @@ export function TitleCard({ title, index = 0 }: TitleCardProps) {
             )}
             {/* Overlay on hover */}
             <div className="absolute inset-0 bg-gradient-to-t from-dark-bg via-dark-bg/60 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-500" />
-
-            {/* Play button on hover */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.5 }}
-              whileHover={{ opacity: 1, scale: 1 }}
-              className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-            >
-              <div className="w-14 h-14 rounded-full bg-neon-cyan/20 backdrop-blur-md border border-neon-cyan/40 flex items-center justify-center">
-                <Play className="w-6 h-6 text-neon-cyan ml-1" />
-              </div>
-            </motion.div>
 
             {/* Type badge */}
             <div className="absolute top-3 left-3 px-2 py-1 rounded-lg glass text-[10px] font-semibold uppercase tracking-wider text-neon-cyan flex items-center gap-1">
@@ -80,7 +69,7 @@ export function TitleCard({ title, index = 0 }: TitleCardProps) {
           </div>
 
           {/* Info */}
-          <div className="p-4 space-y-2 relative z-10 glass-strong m-2 rounded-xl mt-[-20px] transition-transform duration-300 group-hover:-translate-y-2">
+          <div className="p-4 flex flex-col flex-1 relative z-10 glass-strong m-2 rounded-xl mt-[-20px] transition-transform duration-300 group-hover:-translate-y-2">
             <h3 className="font-bold font-heading text-lg text-white leading-tight line-clamp-1 group-hover:text-neon-cyan transition-colors duration-300">
               {title.name}
             </h3>
@@ -102,20 +91,23 @@ export function TitleCard({ title, index = 0 }: TitleCardProps) {
                 </span>
               )}
             </div>
-            <div className="flex flex-wrap gap-1 mt-2">
-              {genres.map((genre) => {
-                const clean = genre.trim();
-                const localized = dict.genres[clean] || clean;
-                return (
-                  <span
-                    key={clean}
-                    className="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-dark-bg text-dark-muted border border-dark-border"
-                  >
-                    {localized}
-                  </span>
-                )
-              })}
-            </div>
+            {genres.length > 0 && (
+              <div className="flex flex-wrap gap-1 mt-auto pt-3">
+                {genres.map((genre) => {
+                  const clean = genre.trim();
+                  if (!clean) return null;
+                  const localized = dict.genres[clean] || clean;
+                  return (
+                    <span
+                      key={clean}
+                      className="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-dark-bg text-dark-muted border border-dark-border"
+                    >
+                      {localized}
+                    </span>
+                  )
+                })}
+              </div>
+            )}
           </div>
         </div>
       </Link>
