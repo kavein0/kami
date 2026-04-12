@@ -20,18 +20,37 @@ async function waitRateLimit() {
 export function normalizeJikanTitle(item: any): TitleData {
   const id = `jikan_${item.mal_id}`;
   
-  // Find backdrop - Try trailer maxrez, otherwise large poster
+  // Find backdrop - Try trailer maxres, otherwise large poster
   const backdrop = item.trailer?.images?.maximum_image_url 
     || item.trailer?.images?.large_image_url 
-    || item.images?.webp?.large_image_url 
+    || item.images?.webp?.large_image_url
+    || item.images?.jpg?.large_image_url
     || null;
+
+  // Poster: try webp first, then jpg fallback
+  const poster = item.images?.webp?.large_image_url 
+    || item.images?.jpg?.large_image_url 
+    || item.images?.webp?.image_url 
+    || item.images?.jpg?.image_url 
+    || null;
+
+  // Jikan splits taxonomy into genres, themes, and demographics.
+  // We merge them all into a single genres string for display.
+  const allGenres = [
+    ...(item.genres || []),
+    ...(item.themes || []),
+    ...(item.demographics || []),
+  ].map((g: any) => g.name);
+  
+  // Deduplicate
+  const uniqueGenres = [...new Set(allGenres)];
 
   return {
     id,
     name: item.title,
     nameEn: item.title_english || item.title,
     type: "anime",
-    poster: item.images?.webp?.large_image_url || null,
+    poster,
     backdrop,
     description: item.synopsis || null,
     trailer: item.trailer?.url || null,
@@ -40,7 +59,7 @@ export function normalizeJikanTitle(item: any): TitleData {
     episodes: item.episodes || null,
     duration: item.duration ? item.duration.replace(" per ep", "") : null,
     studio: item.studios?.[0]?.name || null,
-    genres: item.genres?.map((g: any) => g.name).join(", ") || "",
+    genres: uniqueGenres.join(", "),
     status: item.status?.toLowerCase() || null,
     popularity: item.members || 0,
   };

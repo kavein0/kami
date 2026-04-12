@@ -1,10 +1,10 @@
 import { prisma } from "./prisma";
-import { getPopularTitles } from "./tmdb";
+import { getPopularAnime } from "./jikan";
 
 export async function getPersonalizedRecommendations(userId?: string) {
   if (!userId) {
-    // If not logged in, just return trending across all platforms
-    const { results } = await getPopularTitles("tv", { sortBy: "popularity.desc", page: 2 });
+    // If not logged in, show trending anime
+    const { results } = await getPopularAnime({ sortBy: "score", page: 1 });
     return results.slice(0, 8);
   }
 
@@ -23,7 +23,7 @@ export async function getPersonalizedRecommendations(userId?: string) {
 
   if (listEntries.length === 0) {
     // Fallback if no entries
-    const { results } = await getPopularTitles("tv", { sortBy: "popularity.desc", page: 2 });
+    const { results } = await getPopularAnime({ sortBy: "score", page: 1 });
     return results.slice(0, 8);
   }
 
@@ -37,13 +37,12 @@ export async function getPersonalizedRecommendations(userId?: string) {
 
   const genresArray = Array.from(genreSet);
   if (genresArray.length === 0) {
-    const { results } = await getPopularTitles("tv", { page: 2 });
+    const { results } = await getPopularAnime({ page: 2 });
     return results.slice(0, 8);
   }
 
-  // In a real sophisticated TMDB call, we'd map our text genres to TMDB genre IDs.
-  // We'll approximate by finding popular items (page 3) and filtering locally
-  const { results } = await getPopularTitles("tv", { sortBy: "popularity.desc", page: 3 });
+  // Fetch a different page of top anime to get variety
+  const { results } = await getPopularAnime({ sortBy: "score", page: 2 });
   
   // Filter by matching genres
   const recommended = results.filter((item) => {

@@ -13,6 +13,10 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
+        hostname: "myanimelist.net",
+      },
+      {
+        protocol: "https",
         hostname: "image.tmdb.org",
       },
       {

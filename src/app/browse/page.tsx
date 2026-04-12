@@ -1,4 +1,5 @@
 import { searchTitles, getPopularTitles } from "@/lib/tmdb";
+import { getPopularAnime, searchAnime } from "@/lib/jikan";
 import { SearchBar } from "@/components/search-bar";
 import { Suspense } from "react";
 import { InfiniteScrollGrid } from "@/components/infinite-scroll-grid";
@@ -33,64 +34,69 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
   let totalResults = 0;
 
   if (q) {
-    const res = await searchTitles(q);
-    titles = res.results;
-    totalResults = res.totalResults;
-    // Auto-select tab to the first matched media type if user just searched globally
-    if (!tab && titles.length > 0) {
-      tab = titles[0].type === "series" ? "series" : titles[0].type === "movie" ? "movie" : "anime";
-    } else if (!tab) {
-      tab = "anime"; // fallback
-    }
-
-    if (tab === "anime") titles = titles.filter(t => t.type === "anime");
-    if (tab === "movie") titles = titles.filter(t => t.type === "movie");
-    if (tab === "series") titles = titles.filter(t => t.type === "series");
-  } else {
-    // Determine fetch parameters based on tab selection
-    let genreConfig: GenreConfig | undefined;
-    let fetchType: "tv" | "movie" = "movie";
-    let isAnime = false;
-
     if (tab === "anime") {
-        fetchType = "tv";
-        isAnime = true;
-        
+      const res = await searchAnime(q);
+      titles = res.results;
+      totalResults = res.totalResults;
+    } else {
+      const res = await searchTitles(q);
+      titles = res.results;
+      totalResults = res.totalResults;
+      if (!tab && titles.length > 0) {
+        tab = titles[0].type === "series" ? "series" : titles[0].type === "movie" ? "movie" : "anime";
+      } else if (!tab) {
+        tab = "anime";
+      }
+      if (tab === "movie") titles = titles.filter(t => t.type === "movie");
+      if (tab === "series") titles = titles.filter(t => t.type === "series");
+    }
+  } else {
+    if (tab === "anime") {
+        let genreIds;
         if (genre) {
           const names = genre.split(",");
           const ids = names.map(n => ANIME_GENRES.find(g => g.name === n?.trim())?.id).filter(Boolean);
-          if (ids.length > 0) genreConfig = { id: ids.join("|"), name: genre, type: "genre" }; // Pipe means OR
+          if (ids.length > 0) genreIds = ids.join(",");
         }
-    } else if (tab === "series") {
-        fetchType = "tv";
-        if (genre) {
+        
+        const sortMal = sort === "rating_desc" ? "score" : "members";
+        
+        const res = await getPopularAnime({
+            page: 1,
+            genreId: genreIds as any,
+            sortBy: sortMal,
+        });
+        titles = res.results;
+        totalResults = res.totalResults;
+    } else {
+        let genreConfig: GenreConfig | undefined;
+        let fetchType: "tv" | "movie" = tab === "series" ? "tv" : "movie";
+
+        if (tab === "series" && genre) {
           const names = genre.split(",");
           const ids = names.map(n => SERIES_GENRES.find(g => g.name === n?.trim())?.id).filter(Boolean);
           if (ids.length > 0) genreConfig = { id: ids.join("|"), name: genre, type: "genre" };
-        }
-    } else {
-        fetchType = "movie";
-        if (genre) {
+        } else if (tab === "movie" && genre) {
           const names = genre.split(",");
           const ids = names.map(n => MOVIE_GENRES.find(g => g.name === n?.trim())?.id).filter(Boolean);
           if (ids.length > 0) genreConfig = { id: ids.join("|"), name: genre, type: "genre" };
         }
+
+        const sortConfig = 
+          sort === "rating_desc" ? "vote_average.desc" : 
+          sort === "date_desc" ? (fetchType === "tv" ? "first_air_date.desc" : "primary_release_date.desc") : 
+          "popularity.desc";
+
+        const res = await getPopularTitles(fetchType, {
+            filterAnime: false,
+            page: 1,
+            genreId: genreConfig?.type === "genre" ? genreConfig.id : undefined,
+            keywordId: genreConfig?.type === "keyword" ? genreConfig.id : undefined,
+            sortBy: sortConfig
+        });
+        titles = res.results;
+        totalResults = res.totalResults;
     }
-
-    const sortConfig = 
-      sort === "rating_desc" ? "vote_average.desc" : 
-      sort === "date_desc" ? (fetchType === "tv" ? "first_air_date.desc" : "primary_release_date.desc") : 
-      "popularity.desc";
-
-    const res = await getPopularTitles(fetchType, {
-        filterAnime: isAnime,
-        page: 1,
-        genreId: genreConfig?.type === "genre" ? genreConfig.id : undefined,
-        keywordId: genreConfig?.type === "keyword" ? genreConfig.id : undefined,
-        sortBy: sortConfig
-    });
-    titles = res.results;
-    totalResults = res.totalResults;
   }
 
   // Client-side quick filter for remaining params
