@@ -103,7 +103,7 @@ const SHIKIMORI_BASE = "https://shikimori.one";
 function stripBBCode(text: string): string {
   if (!text) return "";
   return text
-    .replace(/\[\[([^\]]*?)\]\]/g, "") // [[character]] links
+    .replace(/\[\[([^\]]*?)\]\]/g, "$1") // [[character]] links — keep the name text
     .replace(/\[([a-z_]+?)(?:=[^\]]+?)?\](.*?)\[\/\1\]/gs, "$2") // [b]text[/b], [url=...]text[/url]
     .replace(/\[([a-z_]+?)(?:=[^\]]+?)?\]/g, "") // standalone [tag]
     .replace(/\[\/[a-z_]+?\]/g, "") // standalone [/tag]
@@ -199,7 +199,7 @@ async function enrichWithRussian(titles: TitleData[]): Promise<TitleData[]> {
  * Enrich a single TitleData with Russian name AND description from Shikimori.
  * Used on detail pages where we want the full translated description.
  */
-async function enrichDetailWithRussian(title: TitleData): Promise<TitleData> {
+export async function enrichDetailWithRussian(title: TitleData): Promise<TitleData> {
   const lang = await getLanguage();
   if (lang !== "ru") return title;
 

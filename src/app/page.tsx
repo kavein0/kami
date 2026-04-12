@@ -1,9 +1,10 @@
 import { getPopularTitles } from "@/lib/tmdb";
-import { getPopularAnime, fetchKitsuCover } from "@/lib/jikan";
+import { getPopularAnime, fetchKitsuCover, enrichDetailWithRussian } from "@/lib/jikan";
 import { HeroBanner } from "@/components/hero-banner";
 import { TitleSection } from "@/components/title-section";
 import { Flame, TrendingUp, Clapperboard, Sparkles } from "lucide-react";
 import { getDictionary } from "@/lib/i18n";
+import { ANIME_GENRES } from "@/lib/types";
 import { ClientPageTransition } from "@/components/client-page-transition";
 import { auth } from "@/lib/auth";
 import { getPersonalizedRecommendations } from "@/lib/recommendations";
@@ -37,6 +38,8 @@ export default async function HomePage() {
     if (kitsuCover) {
       heroTitle = { ...heroTitle, backdrop: kitsuCover };
     }
+    // Also enrich with Russian description for the hero banner text
+    heroTitle = await enrichDetailWithRussian(heroTitle);
   }
 
   return (
@@ -82,26 +85,18 @@ export default async function HomePage() {
             {dict.home.genresTarget}
           </h2>
           <div className="flex flex-wrap gap-3">
-            {[
-              "Экшен",
-              "Драма",
-              "Комедия",
-              "Романтика",
-              "Фэнтези",
-              "Sci-Fi",
-              "Триллер",
-              "Приключения",
-              "Психологическое",
-              "Сверхъестественное",
-            ].map((genre) => (
-              <a
-                key={genre}
-                href={`/browse?tab=anime&genre=${genre}`}
-                className="px-5 py-2.5 rounded-2xl glass border border-dark-border text-dark-muted hover:text-neon-cyan hover:border-neon-cyan/30 transition-all duration-300 text-sm font-medium"
-              >
-                {genre}
-              </a>
-            ))}
+            {ANIME_GENRES.slice(0, 10).map((g) => {
+              const localized = (dict.genres as Record<string, string>)[g.name] || g.name;
+              return (
+                <a
+                  key={g.name}
+                  href={`/browse?tab=anime&genre=${g.name}`}
+                  className="px-5 py-2.5 rounded-2xl glass border border-dark-border text-dark-muted hover:text-neon-cyan hover:border-neon-cyan/30 transition-all duration-300 text-sm font-medium"
+                >
+                  {localized}
+                </a>
+              );
+            })}
           </div>
         </section>
 

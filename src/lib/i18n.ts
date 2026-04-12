@@ -50,6 +50,8 @@ export const dictionaries = {
       queryFor: "for query",
       emptyState: "Nothing found",
       emptyDesc: "Try changing the filters or your search query",
+      viewAll: "View all results",
+      noResults: "No results found",
     },
     list: {
       title: "My List",
@@ -220,6 +222,10 @@ export const dictionaries = {
       errorEmailExists: "Email is already registered",
       errorGeneric: "Something went wrong",
       passwordMin: "Password must be at least 6 characters",
+      loginSubtitle: "Log in to your KamiList account",
+      registerSubtitle: "Join KamiList",
+      errorEmailInvalid: "Invalid or disposable email address",
+      errorCredentials: "Invalid email or password",
     }
   },
   ru: {
@@ -269,6 +275,8 @@ export const dictionaries = {
       queryFor: "по запросу",
       emptyState: "Ничего не найдено",
       emptyDesc: "Попробуйте изменить фильтры или поисковый запрос",
+      viewAll: "Все результаты",
+      noResults: "Ничего не найдено",
     },
     list: {
       title: "Мой список",
@@ -454,6 +462,10 @@ export const dictionaries = {
       errorEmailExists: "Этот email уже зарегистрирован",
       errorGeneric: "Что-то пошло не так",
       passwordMin: "Пароль должен быть не менее 6 символов",
+      loginSubtitle: "Войдите в свой аккаунт KamiList",
+      registerSubtitle: "Присоединяйтесь к KamiList",
+      errorEmailInvalid: "Неверный или одноразовый email адрес",
+      errorCredentials: "Неверный email или пароль",
     }
   }
 };

@@ -6,6 +6,7 @@ import { useDictionary } from "./dictionary-provider";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { NEON_BLUR_BASE64 } from "@/lib/image-utils";
 
 export function GlobalSearch() {
@@ -27,6 +28,14 @@ export function GlobalSearch() {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  // Close dropdown and clear query when navigating away
+  const pathname = usePathname();
+  useEffect(() => {
+    setIsOpen(false);
+    setQuery("");
+    setResults([]);
+  }, [pathname]);
 
   // Debounce logic
   useEffect(() => {
@@ -147,13 +156,13 @@ export function GlobalSearch() {
                      onClick={() => setIsOpen(false)}
                      className="w-full text-center py-3 text-xs font-bold text-neon-cyan hover:bg-neon-cyan/10 transition-colors mt-1 rounded-lg"
                   >
-                     View all results
+                     {dict.browse.viewAll || "View all results"}
                   </Link>
                 </div>
               ) : !isLoading ? (
                 <div className="p-8 text-center text-dark-muted text-sm flex flex-col items-center gap-3">
                   <Search className="w-8 h-8 opacity-20" />
-                  No results found for "{query}"
+                  {dict.browse.noResults || "No results found"}
                 </div>
               ) : (
                  <div className="p-8 flex justify-center">

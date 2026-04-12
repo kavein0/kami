@@ -64,7 +64,7 @@ export function LoginForm({ dict }: Props) {
             </motion.div>
             <h1 className="text-2xl font-bold text-white">{dict.auth.loginTitle}</h1>
             <p className="text-dark-muted text-sm mt-1">
-              Log in to your KamiList account
+              {dict.auth.loginSubtitle || "Log in to your KamiList account"}
             </p>
           </div>
 

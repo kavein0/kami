@@ -77,7 +77,7 @@ export async function registerAction(formData: FormData) {
       validateSMTP: false, // SMTP checks are too slow and often blocked by Vercel
     });
     if (!emailValidation.valid) {
-      return { error: "Invalid or disposable email address detected." }; // Will use dict.auth.errorEmailInvalid if added to i18n
+      return { error: dict.auth.errorEmailInvalid || "Invalid or disposable email address detected." };
     }
   } catch (err) {
     console.error("Email validation warning:", err);
@@ -138,7 +138,7 @@ export async function loginAction(formData: FormData) {
     });
   } catch (error: unknown) {
     if (error && typeof error === "object" && "type" in error && (error as { type: string }).type === "CredentialsSignin") {
-      return { error: "Invalid credentials" }; // Dictionary could have more specific auth error if added
+      return { error: dict.auth.errorCredentials || "Invalid credentials" };
     }
     throw error;
   }
