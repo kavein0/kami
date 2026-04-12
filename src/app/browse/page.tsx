@@ -161,10 +161,14 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
                 currentValue={genre || ""}
                 defaultLabel={dict.browse.filterAny}
                 multiSelect={true}
-                options={currentTabObj.genres.map((g) => ({
-                  label: g.name,
-                  value: g.name,
-                }))}
+                options={currentTabObj.genres.map((g) => {
+                  const localizedLabel = (dict.genres as Record<string, string>)[g.name] || g.name;
+                  return {
+                    label: localizedLabel,
+                    value: g.name,
+                    description: g.description,
+                  };
+                })}
               />
               
               <DropdownFilter

@@ -30,9 +30,9 @@ export function TitleCard({ title, index = 0 }: TitleCardProps) {
       className="group h-full"
     >
       <Link href={`/title/${title.id}`} className="block h-full">
-        <div className="h-full flex flex-col relative rounded-2xl overflow-hidden bg-dark-card border border-dark-border hover:border-neon-cyan/30 shadow-[0_4px_20px_rgba(0,0,0,0.5)] hover:shadow-[0_0_20px_rgba(0,240,255,0.4)] transition-all duration-500 card-shine">
+        <div className="h-full flex flex-col relative rounded-2xl bg-dark-card border border-dark-border hover:border-neon-cyan/30 shadow-[0_4px_20px_rgba(0,0,0,0.5)] hover:shadow-[0_0_20px_rgba(0,240,255,0.4)] transition-all duration-500 card-shine">
           {/* Poster */}
-          <div className="relative aspect-[2/3] overflow-hidden">
+          <div className="relative aspect-[2/3] overflow-hidden rounded-t-[15px]">
             {title.poster ? (
               <Image
                 src={title.poster}
@@ -100,14 +100,16 @@ export function TitleCard({ title, index = 0 }: TitleCardProps) {
                   if (!clean) return null;
                   const localized = dict.genres[clean] || clean;
                   
-                  let description = "";
+                  let defaultDesc = "";
                   if (title.type === "anime") {
-                     description = ANIME_GENRES.find(g => g.name === clean)?.description || "";
+                     defaultDesc = ANIME_GENRES.find(g => g.name === clean)?.description || "";
                   } else if (title.type === "movie") {
-                     description = MOVIE_GENRES.find(g => g.name === clean)?.description || "";
+                     defaultDesc = MOVIE_GENRES.find(g => g.name === clean)?.description || "";
                   } else {
-                     description = SERIES_GENRES.find(g => g.name === clean)?.description || "";
+                     defaultDesc = SERIES_GENRES.find(g => g.name === clean)?.description || "";
                   }
+                  
+                  const description = dict.genreDescriptions?.[clean] || defaultDesc;
 
                   const genrePill = (
                     <span className="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-dark-bg text-dark-muted border border-dark-border cursor-help hover:text-neon-cyan hover:border-neon-cyan/50 transition-colors">

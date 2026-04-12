@@ -8,6 +8,7 @@ import { useRouter, useSearchParams, usePathname } from "next/navigation";
 export interface FilterOption {
   label: string;
   value: string;
+  description?: string;
 }
 
 interface DropdownFilterProps {
@@ -110,7 +111,7 @@ export function DropdownFilter({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.95 }}
             transition={{ duration: 0.15 }}
-            className="absolute z-50 left-0 mt-2 w-56 p-1.5 rounded-2xl glass-strong border border-dark-border shadow-[0_10px_40px_rgba(0,0,0,0.8)] max-h-[400px] overflow-y-auto scrollbar-thin"
+            className="absolute z-50 left-0 mt-2 w-64 p-1.5 rounded-2xl glass-strong border border-dark-border shadow-[0_10px_40px_rgba(0,0,0,0.8)] max-h-[400px] overflow-y-auto scrollbar-thin"
           >
             <button
               onClick={() => handleSelect("")}
@@ -140,11 +141,18 @@ export function DropdownFilter({
                         : "text-dark-muted hover:text-dark-text hover:bg-dark-hover"
                     }`}
                   >
-                    {option.label}
+                    <div className="flex flex-col flex-1 pr-2">
+                      <span>{option.label}</span>
+                      {option.description && (
+                        <span className="text-[10px] font-normal opacity-70 mt-0.5 line-clamp-2 leading-tight">
+                          {option.description}
+                        </span>
+                      )}
+                    </div>
                     {isActive ? (
-                      <Check className="w-4 h-4 text-neon-cyan" />
+                      <Check className="w-4 h-4 text-neon-cyan flex-shrink-0" />
                     ) : multiSelect ? (
-                      <div className="w-4 h-4 border border-dark-border rounded bg-dark-bg group-hover:border-neon-cyan/50" />
+                      <div className="w-4 h-4 border border-dark-border rounded bg-dark-bg group-hover:border-neon-cyan/50 flex-shrink-0" />
                     ) : null}
                   </button>
                 );
