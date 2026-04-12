@@ -23,6 +23,7 @@ export function InfiniteScrollGrid({ initialTitles, q, tab, genre, year, sort }:
 
   const pageRef = useRef(1);
   const observerTarget = useRef<HTMLDivElement>(null);
+  const isFetchingRef = useRef(false);
 
   useEffect(() => {
     // Reset state if initialTitles changes (e.g. user typed a new search)
@@ -32,7 +33,9 @@ export function InfiniteScrollGrid({ initialTitles, q, tab, genre, year, sort }:
   }, [initialTitles, q, tab, genre, year, sort]);
 
   const fetchMore = useCallback(async () => {
+    if (isFetchingRef.current) return;
     setIsLoading(true);
+    isFetchingRef.current = true;
     const nextPage = pageRef.current + 1;
     try {
       const moreTitles = await loadMoreTitles({
@@ -46,7 +49,12 @@ export function InfiniteScrollGrid({ initialTitles, q, tab, genre, year, sort }:
       if (moreTitles.length === 0) {
         setHasMore(false);
       } else {
-        setTitles((prev) => [...prev, ...moreTitles]);
+        setTitles((prev) => {
+          // Deduplicate based on title id to prevent infinite scroll bugs
+          const existingIds = new Set(prev.map(t => t.id));
+          const uniques = moreTitles.filter(t => !existingIds.has(t.id));
+          return [...prev, ...uniques];
+        });
         pageRef.current = nextPage;
         if (moreTitles.length < 20) setHasMore(false);
       }
@@ -55,17 +63,18 @@ export function InfiniteScrollGrid({ initialTitles, q, tab, genre, year, sort }:
       setHasMore(false);
     } finally {
       setIsLoading(false);
+      isFetchingRef.current = false;
     }
   }, [q, tab, genre, year, sort]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && !isLoading) {
+        if (entries[0].isIntersecting && !isLoading && !isFetchingRef.current) {
           fetchMore();
         }
       },
-      { threshold: 1.0 }
+      { rootMargin: '400px' }
     );
 
     const target = observerTarget.current;

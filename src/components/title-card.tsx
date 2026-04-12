@@ -7,6 +7,8 @@ import Image from "next/image";
 import type { TitleData } from "@/lib/types";
 import { useDictionary } from "./dictionary-provider";
 import { NEON_BLUR_BASE64 } from "@/lib/image-utils";
+import { GenreTooltip } from "./genre-tooltip";
+import { ANIME_GENRES, MOVIE_GENRES, SERIES_GENRES } from "@/lib/types";
 
 interface TitleCardProps {
   title: TitleData;
@@ -97,14 +99,29 @@ export function TitleCard({ title, index = 0 }: TitleCardProps) {
                   const clean = genre.trim();
                   if (!clean) return null;
                   const localized = dict.genres[clean] || clean;
-                  return (
-                    <span
-                      key={clean}
-                      className="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-dark-bg text-dark-muted border border-dark-border"
-                    >
+                  
+                  let description = "";
+                  if (title.type === "anime") {
+                     description = ANIME_GENRES.find(g => g.name === clean)?.description || "";
+                  } else if (title.type === "movie") {
+                     description = MOVIE_GENRES.find(g => g.name === clean)?.description || "";
+                  } else {
+                     description = SERIES_GENRES.find(g => g.name === clean)?.description || "";
+                  }
+
+                  const genrePill = (
+                    <span className="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-dark-bg text-dark-muted border border-dark-border cursor-help hover:text-neon-cyan hover:border-neon-cyan/50 transition-colors">
                       {localized}
                     </span>
-                  )
+                  );
+
+                  return description ? (
+                    <GenreTooltip key={clean} description={description}>
+                      {genrePill}
+                    </GenreTooltip>
+                  ) : (
+                    <span key={clean}>{genrePill}</span>
+                  );
                 })}
               </div>
             )}
