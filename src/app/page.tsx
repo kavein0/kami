@@ -18,10 +18,18 @@ export default async function HomePage() {
 
   const dict = await getDictionary();
 
-  // Anime of the day logic (Changes randomly based on current day numerical value)
-  const currentDaySeed = new Date().getDate() + new Date().getMonth();
-  const randomIndex = currentDaySeed % Math.max(topAnime.length, 1);
-  const heroTitle = topAnime[randomIndex] || topAnime[0];
+  // "Anime of the Day" — rotates daily at 00:00 UTC
+  // Uses days since Unix epoch as a stable, timezone-independent seed
+  const utcNow = new Date();
+  const daysSinceEpoch = Math.floor(utcNow.getTime() / (1000 * 60 * 60 * 24));
+
+  // Pick a pseudo-random page (1-10) from top anime so we don't always cycle the same 24
+  const heroPage = (daysSinceEpoch % 10) + 1;
+  const { results: heroPool } = await getPopularAnime({ sortBy: "score", page: heroPage });
+
+  // Pick an index within that page based on the day
+  const heroIndex = daysSinceEpoch % Math.max(heroPool.length, 1);
+  const heroTitle = heroPool[heroIndex] || topAnime[0];
 
   return (
     <ClientPageTransition>
