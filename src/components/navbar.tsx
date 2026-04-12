@@ -12,8 +12,9 @@ import {
   X,
   Home,
   Sparkles,
+  Loader2,
 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useTransition } from "react";
 import { logoutAction, setLanguage } from "@/app/actions";
 import { GlobalSearch } from "./global-search";
 
@@ -22,6 +23,7 @@ export function Navbar({ lang, dict }: { lang: string, dict: Record<string, stri
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [session, setSession] = useState<{ user?: { name?: string | null; email?: string | null } } | null>(null);
+  const [isPendingLang, startTransitionLang] = useTransition();
 
   useEffect(() => {
     fetch("/api/auth/session")
@@ -102,10 +104,11 @@ export function Navbar({ lang, dict }: { lang: string, dict: Record<string, stri
           <div className="hidden md:flex items-center gap-3 relative">
             <GlobalSearch />
             <button
-               onClick={() => setLanguage(lang === 'ru' ? 'en' : 'ru')}
+               onClick={() => startTransitionLang(() => setLanguage(lang === 'ru' ? 'en' : 'ru'))}
+               disabled={isPendingLang}
                className="flex items-center justify-center font-bold text-xs w-8 h-8 rounded-full border border-dark-border text-dark-muted hover:text-neon-cyan hover:border-neon-cyan transition-colors"
             >
-               {lang.toUpperCase()}
+               {isPendingLang ? <Loader2 className="w-4 h-4 animate-spin text-neon-cyan" /> : lang.toUpperCase()}
             </button>
             {session?.user ? (
               <>
@@ -170,10 +173,13 @@ export function Navbar({ lang, dict }: { lang: string, dict: Record<string, stri
             ))}
             <div className="border-t border-dark-border pt-2 mt-2">
               <button
-                 onClick={() => setLanguage(lang === 'ru' ? 'en' : 'ru')}
+                 onClick={() => startTransitionLang(() => setLanguage(lang === 'ru' ? 'en' : 'ru'))}
+                 disabled={isPendingLang}
                  className="flex mb-2 items-center gap-3 px-4 py-3 rounded-xl text-dark-muted hover:text-neon-cyan w-full text-left"
               >
-                <span className="font-bold w-5 h-5 flex items-center">{lang.toUpperCase()}</span>
+                <span className="font-bold w-5 h-5 flex items-center justify-center">
+                  {isPendingLang ? <Loader2 className="w-4 h-4 animate-spin text-neon-cyan" /> : lang.toUpperCase()}
+                </span>
                 Language / Язык
               </button>
               {session?.user ? (

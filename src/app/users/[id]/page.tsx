@@ -11,8 +11,15 @@ export default async function PublicProfilePage({ params }: Props) {
   const { id } = await params;
   const session = await auth();
 
-  const user = await prisma.user.findUnique({
-    where: { id },
+  const decodedId = decodeURIComponent(id);
+
+  const user = await prisma.user.findFirst({
+    where: {
+      OR: [
+        { id: decodedId },
+        { name: decodedId }
+      ]
+    },
     include: {
       _count: {
         select: { followers: true, following: true }

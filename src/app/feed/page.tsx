@@ -16,23 +16,35 @@ export default async function FeedPage() {
   const lang = await getLanguage();
 
   let followingIds: string[] = [];
+  let currentUserName: string | null = null;
   if (session?.user?.id) {
-    const follows = await prisma.follows.findMany({
-      where: { followerId: session.user.id },
-      select: { followingId: true },
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      include: { following: true }
     });
-    followingIds = follows.map((f) => f.followingId);
+    if (user) {
+      currentUserName = user.name;
+      followingIds = user.following.map((f) => f.followingId);
+    }
   }
 
-  // Fetch activities (limit to followings only as requested)
-  // If the user has no followings, the result will (correctly) be an empty list of results
-  const whereClause = session?.user?.id 
+  // Fetch activities
+  const entriesWhere = session?.user?.id 
     ? { userId: { in: followingIds } } 
-    : { userId: "none" }; // Guest sees nothing in a "friends-only" feed
+    : { userId: "none" };
+
+  const reviewsWhere = session?.user?.id 
+    ? {
+        OR: [
+          { userId: { in: followingIds } },
+          currentUserName ? { content: { contains: `@${currentUserName}`, mode: "insensitive" as const } } : {}
+        ].filter(condition => Object.keys(condition).length > 0)
+      }
+    : { userId: "none" };
 
   // Fetch recent ListEntries
   const recentEntries = await prisma.listEntry.findMany({
-    where: whereClause,
+    where: entriesWhere,
     take: 20,
     orderBy: { updatedAt: "desc" },
     include: {
@@ -43,7 +55,7 @@ export default async function FeedPage() {
 
   // Fetch recent Reviews
   const recentReviews = await prisma.review.findMany({
-    where: whereClause,
+    where: reviewsWhere as any,
     take: 20,
     orderBy: { createdAt: "desc" },
     include: {

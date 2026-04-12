@@ -26,6 +26,25 @@ import { ClientPageTransition } from "@/components/client-page-transition";
 import { useRef } from "react";
 import { useScroll, useTransform } from "framer-motion";
 
+function parseReviewContent(text: string) {
+  if (!text) return null;
+  // Match @username. Username can contain alphanumerics, underscores, and cyrillic letters.
+  const mentionRegex = /@([a-zA-Z0-9_а-яА-Я-]+)/g;
+  const parts = text.split(mentionRegex);
+  
+  return parts.map((part, i) => {
+    // Every odd index in split() output with 1 capture group is the captured mention
+    if (i % 2 === 1) {
+      return (
+        <Link key={i} href={`/users/${encodeURIComponent(part)}`} className="text-neon-cyan hover:underline font-medium">
+          @{part}
+        </Link>
+      );
+    }
+    return part;
+  });
+}
+
 interface TitleDetailClientProps {
   title: TitleData;
   userEntry: { id: string; status: string; score: number | null } | null;
@@ -352,7 +371,7 @@ export function TitleDetailClient({
               reviews.map(review => (
                 <div key={review.id} className="p-4 rounded-2xl glass-strong border border-dark-border">
                   <div className="flex items-center gap-3 mb-3">
-                    <div className="w-10 h-10 rounded-full bg-dark-border overflow-hidden relative">
+                    <Link href={`/users/${review.user.id}`} className="w-10 h-10 rounded-full bg-dark-border overflow-hidden relative shrink-0 border border-dark-border hover:border-neon-cyan/50 transition-colors">
                       {review.user.image ? (
                          <Image src={review.user.image} alt="Avatar" fill className="object-cover" />
                       ) : (
@@ -360,9 +379,11 @@ export function TitleDetailClient({
                            {review.user.name?.[0]?.toUpperCase() || "U"}
                          </div>
                       )}
-                    </div>
+                    </Link>
                     <div>
-                      <div className="font-bold text-sm">{review.user.name || "Anon"}</div>
+                      <Link href={`/users/${review.user.id}`} className="font-bold text-sm hover:text-neon-cyan transition-colors">
+                        {review.user.name || "Anon"}
+                      </Link>
                       <div className="text-xs text-dark-muted">{new Date(review.createdAt).toLocaleDateString()}</div>
                     </div>
                     {review.rating ? (
@@ -373,7 +394,7 @@ export function TitleDetailClient({
                     ) : null}
                   </div>
                   <p className="text-sm text-dark-text/90 leading-relaxed whitespace-pre-wrap">
-                    {review.content}
+                    {parseReviewContent(review.content)}
                   </p>
                 </div>
               ))

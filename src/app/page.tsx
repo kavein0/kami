@@ -11,22 +11,27 @@ import { getPersonalizedRecommendations } from "@/lib/recommendations";
 
 export default async function HomePage() {
   const session = await auth();
-  const recommended = await getPersonalizedRecommendations(session?.user?.id);
 
-  const { results: topAnime } = await getPopularAnime({ sortBy: "members", page: 1 });
-  const { results: topMovies } = await getPopularTitles("movie", { sortBy: "popularity.desc", page: 1 });
-  const { results: topSeries } = await getPopularTitles("tv", { sortBy: "popularity.desc", filterAnime: false, page: 1 });
-
-  const dict = await getDictionary();
-
-  // "Anime of the Day" — rotates daily at 00:00 UTC
-  // Uses days since Unix epoch as a stable, timezone-independent seed
   const utcNow = new Date();
   const daysSinceEpoch = Math.floor(utcNow.getTime() / (1000 * 60 * 60 * 24));
-
-  // Pick a pseudo-random page (1-10) from top anime so we don't always cycle the same 24
   const heroPage = (daysSinceEpoch % 10) + 1;
-  const { results: heroPool } = await getPopularAnime({ sortBy: "score", page: heroPage });
+
+  // Run all independent fetch requests in parallel for massive performance boost
+  const [
+    recommended,
+    { results: topAnime },
+    { results: topMovies },
+    { results: topSeries },
+    dict,
+    { results: heroPool }
+  ] = await Promise.all([
+    getPersonalizedRecommendations(session?.user?.id),
+    getPopularAnime({ sortBy: "members", page: 1 }),
+    getPopularTitles("movie", { sortBy: "popularity.desc", page: 1 }),
+    getPopularTitles("tv", { sortBy: "popularity.desc", filterAnime: false, page: 1 }),
+    getDictionary(),
+    getPopularAnime({ sortBy: "score", page: heroPage })
+  ]);
 
   // Pick an index within that page based on the day
   const heroIndex = daysSinceEpoch % Math.max(heroPool.length, 1);
@@ -34,12 +39,15 @@ export default async function HomePage() {
 
   // Enrich hero with high-res Kitsu cover image (3360x800) for the banner
   if (heroTitle) {
-    const kitsuCover = await fetchKitsuCover(heroTitle.nameEn || heroTitle.name);
+    const [kitsuCover, enrichedHeroTitle] = await Promise.all([
+      fetchKitsuCover(heroTitle.nameEn || heroTitle.name),
+      enrichDetailWithRussian(heroTitle)
+    ]);
+    
+    heroTitle = enrichedHeroTitle;
     if (kitsuCover) {
       heroTitle = { ...heroTitle, backdrop: kitsuCover };
     }
-    // Also enrich with Russian description for the hero banner text
-    heroTitle = await enrichDetailWithRussian(heroTitle);
   }
 
   return (
