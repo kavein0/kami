@@ -163,10 +163,11 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
                 multiSelect={true}
                 options={currentTabObj.genres.map((g) => {
                   const localizedLabel = (dict.genres as Record<string, string>)[g.name] || g.name;
+                  const localizedDesc = (dict.genreDescriptions as Record<string, string>)?.[g.name] || g.description;
                   return {
                     label: localizedLabel,
                     value: g.name,
-                    description: g.description,
+                    description: localizedDesc,
                   };
                 })}
               />
