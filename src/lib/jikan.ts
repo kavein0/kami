@@ -1,5 +1,6 @@
 import { TitleData } from "./types";
 import { prisma } from "./prisma";
+import { getLanguage } from "./i18n";
 
 // Rate limiting state for Jikan (since it doesn't require API keys but aggressively limits)
 // Jikan limits: 3 requests per second, 60 requests per minute
@@ -65,6 +66,132 @@ export function normalizeJikanTitle(item: any): TitleData {
   };
 }
 
+// ==================== SHIKIMORI (Russian Localization) ====================
+
+const SHIKIMORI_BASE = "https://shikimori.one";
+
+/**
+ * Strip Shikimori's BBCode markup from descriptions.
+ * e.g. [[character]] links, [b]bold[/b], etc.
+ */
+function stripBBCode(text: string): string {
+  if (!text) return "";
+  return text
+    .replace(/\[\[([^\]]*?)\]\]/g, "") // [[character]] links
+    .replace(/\[([a-z_]+?)(?:=[^\]]+?)?\](.*?)\[\/\1\]/gs, "$2") // [b]text[/b], [url=...]text[/url]
+    .replace(/\[([a-z_]+?)(?:=[^\]]+?)?\]/g, "") // standalone [tag]
+    .replace(/\[\/[a-z_]+?\]/g, "") // standalone [/tag]
+    .trim();
+}
+
+/**
+ * Batch-fetch Russian names and descriptions from Shikimori.
+ * Uses the batch endpoint: GET /api/animes?ids=1,2,3&limit=50
+ */
+async function fetchShikimoriRussian(malIds: number[]): Promise<Map<number, { russian: string; description: string }>> {
+  const map = new Map<number, { russian: string; description: string }>();
+  if (malIds.length === 0) return map;
+
+  try {
+    const url = `${SHIKIMORI_BASE}/api/animes?ids=${malIds.join(",")}&limit=50`;
+    const res = await fetch(url, {
+      headers: { "User-Agent": "KamiList/1.0" },
+      next: { revalidate: 86400 } // 24h cache
+    });
+
+    if (!res.ok) return map;
+    const data = await res.json();
+
+    for (const item of data) {
+      map.set(item.id, {
+        russian: item.russian || "",
+        description: "", // batch endpoint doesn't return description
+      });
+    }
+  } catch (err) {
+    console.error("Shikimori batch fetch error:", err);
+  }
+
+  return map;
+}
+
+/**
+ * Fetch detailed Russian description for a single anime from Shikimori.
+ */
+async function fetchShikimoriDetail(malId: number): Promise<{ russian: string; description: string } | null> {
+  try {
+    const url = `${SHIKIMORI_BASE}/api/animes/${malId}`;
+    const res = await fetch(url, {
+      headers: { "User-Agent": "KamiList/1.0" },
+      next: { revalidate: 86400 }
+    });
+
+    if (!res.ok) return null;
+    const data = await res.json();
+
+    return {
+      russian: data.russian || "",
+      description: data.description ? stripBBCode(data.description) : "",
+    };
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Enrich an array of TitleData with Russian names from Shikimori.
+ * Only runs when language is "ru".
+ */
+async function enrichWithRussian(titles: TitleData[]): Promise<TitleData[]> {
+  const lang = await getLanguage();
+  if (lang !== "ru") return titles;
+
+  const malIds = titles
+    .map(t => parseInt(t.id.replace("jikan_", "")))
+    .filter(id => !isNaN(id));
+
+  if (malIds.length === 0) return titles;
+
+  const russianMap = await fetchShikimoriRussian(malIds);
+
+  return titles.map(title => {
+    const malId = parseInt(title.id.replace("jikan_", ""));
+    const ruData = russianMap.get(malId);
+
+    if (ruData && ruData.russian) {
+      return {
+        ...title,
+        name: ruData.russian,
+        // Keep nameEn as original English/Japanese name
+      };
+    }
+    return title;
+  });
+}
+
+/**
+ * Enrich a single TitleData with Russian name AND description from Shikimori.
+ * Used on detail pages where we want the full translated description.
+ */
+async function enrichDetailWithRussian(title: TitleData): Promise<TitleData> {
+  const lang = await getLanguage();
+  if (lang !== "ru") return title;
+
+  const malId = parseInt(title.id.replace("jikan_", ""));
+  if (isNaN(malId)) return title;
+
+  const ruData = await fetchShikimoriDetail(malId);
+  if (!ruData) return title;
+
+  return {
+    ...title,
+    name: ruData.russian || title.name,
+    description: ruData.description || title.description,
+  };
+}
+
+// ==================== JIKAN API ====================
+
 export async function fetchJikan(endpoint: string, params: Record<string, string> = {}) {
   await waitRateLimit();
   
@@ -101,7 +228,10 @@ export async function fetchJikan(endpoint: string, params: Record<string, string
 export async function searchAnime(query: string, page = 1): Promise<{ results: TitleData[], totalResults: number }> {
   try {
     const data = await fetchJikan("/anime", { q: query, page: page.toString(), limit: "15" });
-    const results = (data.data || []).map((item: any) => normalizeJikanTitle(item));
+    let results = (data.data || []).map((item: any) => normalizeJikanTitle(item));
+    
+    // Enrich with Russian names
+    results = await enrichWithRussian(results);
 
     return { 
        results, 
@@ -136,8 +266,11 @@ export async function getPopularAnime(
     params["sort"] = "desc";
     
     const data = await fetchJikan("/anime", params);
+    let results = (data.data || []).map((item: any) => normalizeJikanTitle(item));
+    results = await enrichWithRussian(results);
+    
     return {
-      results: (data.data || []).map((item: any) => normalizeJikanTitle(item)),
+      results,
       totalResults: data.pagination?.items?.total || 0
     };
   } else {
@@ -150,15 +283,18 @@ export async function getPopularAnime(
     }
 
     const data = await fetchJikan(endpoint, params);
+    let results = (data.data || []).map((item: any) => normalizeJikanTitle(item));
+    results = await enrichWithRussian(results);
+    
     return {
-      results: (data.data || []).map((item: any) => normalizeJikanTitle(item)),
+      results,
       totalResults: data.pagination?.items?.total || 0
     };
   }
 }
 
 /**
- * Get anime detail by MAL ID
+ * Get anime detail by MAL ID (with full Russian translation for detail pages)
  */
 export async function getAnimeDetail(internalId: string): Promise<TitleData | null> {
   const malId = internalId.replace("jikan_", "").replace("anime_", ""); // Fallback cleanup
@@ -169,7 +305,11 @@ export async function getAnimeDetail(internalId: string): Promise<TitleData | nu
      return prisma.title.findUnique({ where: { id: internalId } });
   }
 
-  return normalizeJikanTitle(data.data);
+  let title = normalizeJikanTitle(data.data);
+  // For detail pages, fetch both Russian name AND description
+  title = await enrichDetailWithRussian(title);
+  
+  return title;
 }
 
 /**
@@ -182,5 +322,8 @@ export async function getSimilarAnime(internalId: string): Promise<TitleData[]> 
   const recs = data.data || [];
   
   // Format is { entry: { mal_id, title... }, votes }
-  return recs.slice(0, 12).map((item: any) => normalizeJikanTitle(item.entry));
+  let results = recs.slice(0, 12).map((item: any) => normalizeJikanTitle(item.entry));
+  results = await enrichWithRussian(results);
+  
+  return results;
 }
