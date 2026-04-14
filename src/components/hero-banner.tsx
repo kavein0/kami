@@ -4,7 +4,7 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { Star, Play, Sparkles } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import { useRef } from "react";
+import { useRef, useEffect, useState } from "react";
 import type { TitleData } from "@/lib/types";
 import { useDictionary } from "./dictionary-provider";
 import { NEON_BLUR_BASE64 } from "@/lib/image-utils";
@@ -16,6 +16,11 @@ interface HeroBannerProps {
 export function HeroBanner({ title }: HeroBannerProps) {
   const dict = useDictionary();
   const ref = useRef(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -50,7 +55,7 @@ export function HeroBanner({ title }: HeroBannerProps) {
 
       {/* Animated neon particles */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {[...Array(5)].map((_, i) => (
+        {mounted && [...Array(5)].map((_, i) => (
           <motion.div
             key={i}
             className="absolute w-1.5 h-1.5 rounded-full bg-neon-cyan shadow-[0_0_10px_rgba(0,240,255,0.8)]"
