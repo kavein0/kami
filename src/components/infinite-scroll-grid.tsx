@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { TitleCard } from "./title-card";
 import { TitleListItem } from "./title-list-item";
-import { SkeletonGrid } from "./skeleton-card";
+import { SkeletonCard } from "./skeleton-card";
 import { TitleData } from "@/lib/types";
 import { loadMoreTitles } from "@/app/actions/browse";
 import { useDictionary } from "./dictionary-provider";
