@@ -18,7 +18,7 @@ import { useState, useTransition } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { toggleFollow } from "@/app/actions/social";
-import type { UserStats } from "@/lib/types";
+import type { UserStats, UserSmall } from "@/lib/types";
 import { PieChart, Pie, Cell, Tooltip as RechartsTooltip, ResponsiveContainer } from "recharts";
 import { useDictionary } from "./dictionary-provider";
 

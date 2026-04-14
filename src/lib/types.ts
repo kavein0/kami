@@ -49,6 +49,12 @@ export interface UserStats {
   totalEntries: number;
 }
 
+export interface UserSmall {
+  id: string;
+  name: string | null;
+  image: string | null;
+}
+
 export const STATUS_LABELS: Record<ListStatus, string> = {
   watched: "completed",
   watching: "watching",
