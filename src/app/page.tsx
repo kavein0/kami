@@ -23,22 +23,25 @@ export default async function HomePage() {
     { results: topMovies },
     { results: topSeries },
     dict,
-    { results: heroPool }
+    { results: heroPoolAnime }
   ] = await Promise.all([
     getActivityFeedTitles(session?.user?.id),
     getPopularAnime({ sortBy: "members", page: 1 }),
-    getPopularTitles("movie", { sortBy: "popularity.desc", page: 1 }),
-    getPopularTitles("tv", { sortBy: "popularity.desc", filterAnime: false, page: 1 }),
+    getPopularTitles("movie", { sortBy: "popularity.desc", page: heroPage }),
+    getPopularTitles("tv", { sortBy: "popularity.desc", filterAnime: false, page: heroPage }),
     getDictionary(),
     getPopularAnime({ sortBy: "score", page: heroPage })
   ]);
 
-  // Pick an index within that page based on the day
-  const heroIndex = daysSinceEpoch % Math.max(heroPool.length, 1);
-  let heroTitle = heroPool[heroIndex] || topAnime[0];
+  // Combine top-rated anime, movies, and series of the current page for the daily hero pool
+  const mixedHeroPool = [...heroPoolAnime.slice(0, 5), ...topMovies.slice(0, 5), ...topSeries.slice(0, 5)];
 
-  // Enrich hero with high-res Kitsu cover image (3360x800) for the banner
-  if (heroTitle) {
+  // Pick an index within that page based on the day
+  const heroIndex = daysSinceEpoch % Math.max(mixedHeroPool.length, 1);
+  let heroTitle = mixedHeroPool[heroIndex] || topAnime[0];
+
+  // If the selected hero is an anime, enrich it with a high-res Kitsu cover image (3360x800)
+  if (heroTitle && heroTitle.type === "anime") {
     const [kitsuCover, enrichedHeroTitle] = await Promise.all([
       fetchKitsuCover(heroTitle.nameEn || heroTitle.name),
       enrichDetailWithRussian(heroTitle)

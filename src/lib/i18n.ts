@@ -25,7 +25,8 @@ export const dictionaries = {
     home: {
       heroWatch: "Watch",
       heroDetails: "Details",
-      popularAnime: "Top Anime",
+      popularAnime: "Popular Anime",
+      recommendationOfDay: "Recommendation of the day",
       topMovies: "Top Movies",
       topSeries: "Top Series",
       genresTarget: "Genres",
@@ -370,6 +371,7 @@ export const dictionaries = {
       heroWatch: "Смотреть",
       heroDetails: "Подробнее",
       popularAnime: "Топ аниме",
+      recommendationOfDay: "Рекомендация дня",
       topMovies: "Топ фильмы",
       topSeries: "Топ сериалы",
       genresTarget: "Жанры",

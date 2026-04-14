@@ -84,7 +84,7 @@ export function HeroBanner({ title }: HeroBannerProps) {
             <div className="flex items-center gap-2 mb-4 glass inline-flex px-3 py-1 rounded-full border border-neon-cyan/30 shadow-[0_0_15px_rgba(0,240,255,0.2)]">
               <Sparkles className="w-4 h-4 text-neon-cyan animate-pulse-neon" />
               <span className="text-xs font-bold text-neon-cyan uppercase tracking-[0.2em]">
-                {dict.home.popularAnime || "Featured Of The Day"}
+                {dict.home.recommendationOfDay || "Recommendation Of The Day"}
               </span>
             </div>
 
