@@ -91,7 +91,7 @@ export function PublicProfileClient({
             <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-neon-cyan to-neon-pink flex items-center justify-center text-3xl font-bold text-dark-bg shrink-0 relative overflow-hidden">
               {user.image ? (
                 <div className="relative w-full h-full">
-                  <Image src={user.image} alt={user.name || "User"} fill className="object-cover" />
+                  <Image src={user.image} alt={user.name || "User"} fill sizes="96px" className="object-cover" />
                 </div>
               ) : (
                 <span>{user.name?.[0]?.toUpperCase() || "K"}</span>
@@ -218,11 +218,11 @@ export function PublicProfileClient({
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
           
           {/* Genre Chart */}
-          <div className="glass-strong rounded-3xl p-6 border border-dark-border flex flex-col items-center">
+          <div className="glass-strong rounded-3xl p-6 border border-dark-border flex flex-col items-center min-w-0">
             <h2 className="text-lg font-bold mb-4 w-full">{dict.profile.favoriteGenres}</h2>
             {topGenres && topGenres.length > 0 ? (
               <>
-                <div className="h-64 w-full">
+                <div className="h-64 w-full relative min-w-0">
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <Pie
@@ -335,10 +335,10 @@ export function PublicProfileClient({
                 <div className="grid grid-cols-1 gap-3">
                    {following.map(u => (
                       <Link key={u.id} href={`/users/${u.id}`} className="flex items-center gap-4 p-4 rounded-2xl bg-dark-surface/50 border border-dark-border hover:border-neon-cyan/50 hover:bg-neon-cyan/5 transition-all group">
-                         <div className="w-12 h-12 rounded-full bg-dark-bg overflow-hidden flex items-center justify-center border border-dark-border group-hover:border-neon-cyan/50 transition-colors">
+                         <div className="w-12 h-12 rounded-full bg-dark-bg overflow-hidden flex items-center justify-center border border-dark-border group-hover:border-neon-cyan/50 transition-colors relative">
                            {u.image ? (
                              <div className="relative w-full h-full">
-                               <Image src={u.image} alt={u.name || ""} fill className="object-cover" />
+                               <Image src={u.image} alt={u.name || ""} fill sizes="48px" className="object-cover" />
                              </div>
                            ) : (
                              <span className="text-sm font-bold text-dark-muted">{u.name?.[0]?.toUpperCase()}</span>

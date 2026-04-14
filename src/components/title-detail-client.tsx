@@ -373,7 +373,7 @@ export function TitleDetailClient({
                   <div className="flex items-center gap-3 mb-3">
                     <Link href={`/users/${review.user.id}`} className="w-10 h-10 rounded-full bg-dark-border overflow-hidden relative shrink-0 border border-dark-border hover:border-neon-cyan/50 transition-colors">
                       {review.user.image ? (
-                         <Image src={review.user.image} alt="Avatar" fill className="object-cover" />
+                         <Image src={review.user.image} alt="Avatar" fill sizes="40px" className="object-cover" />
                       ) : (
                          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-neon-cyan to-neon-purple text-dark-bg font-bold">
                            {review.user.name?.[0]?.toUpperCase() || "U"}

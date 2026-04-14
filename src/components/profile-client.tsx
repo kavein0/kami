@@ -115,7 +115,7 @@ export function ProfileClient({
             <div className="flex flex-col items-center gap-2">
               <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-neon-cyan to-neon-pink flex items-center justify-center text-3xl font-bold text-dark-bg shrink-0 relative overflow-hidden">
                 {user.image ? (
-                  <Image src={user.image} alt={user.name || "User"} fill className="object-cover" />
+                  <Image src={user.image} alt={user.name || "User"} fill sizes="96px" className="object-cover" />
                 ) : (
                   <span>{user.name?.[0]?.toUpperCase() || "K"}</span>
                 )}
@@ -321,7 +321,7 @@ export function ProfileClient({
           >
             <h2 className="text-lg font-bold mb-4">{dict.profile.favoriteGenres}</h2>
             {topGenres && topGenres.length > 0 ? (
-              <div className="h-64 cursor-default">
+              <div className="h-64 w-full cursor-default relative min-w-0">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
@@ -456,7 +456,7 @@ export function ProfileClient({
                     <Link key={u.id} href={`/users/${u.id}`} className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 transition-colors group">
                       <div className="w-10 h-10 rounded-full bg-dark-bg overflow-hidden border border-dark-border group-hover:border-neon-cyan/50 transition-colors">
                         {u.image ? (
-                          <Image src={u.image} alt={u.name || ""} width={40} height={40} className="object-cover" />
+                          <Image src={u.image} alt={u.name || ""} fill sizes="40px" className="object-cover" />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center font-bold text-dark-muted">{u.name?.[0]}</div>
                         )}

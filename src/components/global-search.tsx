@@ -123,7 +123,7 @@ export function GlobalSearch() {
                              src={title.poster}
                              alt={title.name}
                              fill
-                             sizes="48px"
+                             sizes="40px"
                              className="object-cover"
                              placeholder="blur"
                              blurDataURL={NEON_BLUR_BASE64}

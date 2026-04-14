@@ -45,7 +45,7 @@ export default async function RootLayout({
   } : null;
 
   return (
-    <html lang={lang} className="dark" suppressHydrationWarning>
+    <html lang={lang} className="dark" data-scroll-behavior="smooth" suppressHydrationWarning>
       <body className={`${inter.variable} ${outfit.variable} font-sans antialiased bg-dark-bg min-h-screen relative`} suppressHydrationWarning>
         <BackgroundEffects />
         <DictionaryProvider dict={dict}>
