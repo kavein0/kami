@@ -20,7 +20,12 @@ export default async function PublicProfilePage({ params }: Props) {
         { name: decodedId }
       ]
     },
-    include: {
+    select: {
+      id: true,
+      name: true,
+      bio: true,
+      image: true,
+      createdAt: true,
       _count: {
         select: { followers: true, following: true }
       }

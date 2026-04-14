@@ -4,6 +4,7 @@ import "./globals.css";
 import { Navbar } from "@/components/navbar";
 import { MobileNav } from "@/components/mobile-nav";
 import { getLanguage, getDictionary } from "@/lib/i18n";
+import { auth } from "@/lib/auth";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { DictionaryProvider } from "@/components/dictionary-provider";
@@ -35,12 +36,18 @@ export default async function RootLayout({
 }) {
   const lang = await getLanguage();
   const dict = await getDictionary();
+  const session = await auth();
+
+  const navUser = session?.user ? {
+    name: session.user.name ?? null,
+    image: session.user.image ?? null,
+  } : null;
 
   return (
     <html lang={lang} className="dark" suppressHydrationWarning>
       <body className={`${inter.variable} ${outfit.variable} font-sans antialiased bg-dark-bg min-h-screen`} suppressHydrationWarning>
         <DictionaryProvider dict={dict}>
-          <Navbar lang={lang} dict={dict.nav} />
+          <Navbar lang={lang} dict={dict.nav} user={navUser} />
           <main className="pb-20 md:pb-0">{children}</main>
           <MobileNav dict={dict.nav} />
           <Analytics />

@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, Check } from "lucide-react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
+import { useDictionary } from "./dictionary-provider";
 
 export interface FilterOption {
   label: string;
@@ -26,7 +27,7 @@ export function DropdownFilter({
   options,
   currentValue,
   paramKey,
-  defaultLabel = "Все",
+  defaultLabel,
   icon,
   multiSelect = false,
 }: DropdownFilterProps) {
@@ -35,6 +36,9 @@ export function DropdownFilter({
   const router = useRouter();
   const searchParams = useSearchParams();
   const pathname = usePathname();
+  const dict = useDictionary();
+
+  const resolvedDefaultLabel = defaultLabel || dict.browse.filterAny;
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -83,8 +87,8 @@ export function DropdownFilter({
   };
 
   const displayLabel = multiSelect 
-    ? (currentValuesArray.length > 0 ? `${currentValuesArray.length} выбрано` : defaultLabel)
-    : (options.find((o) => o.value === currentValue)?.label || defaultLabel);
+    ? (currentValuesArray.length > 0 ? `${currentValuesArray.length} ${dict.browse.selected}` : resolvedDefaultLabel)
+    : (options.find((o) => o.value === currentValue)?.label || resolvedDefaultLabel);
 
   return (
     <div className="relative" ref={ref}>
@@ -121,7 +125,7 @@ export function DropdownFilter({
                   : "text-dark-muted hover:text-dark-text hover:bg-dark-hover"
               }`}
             >
-              {defaultLabel}
+              {resolvedDefaultLabel}
               {!currentValue && <Check className="w-4 h-4" />}
             </button>
             

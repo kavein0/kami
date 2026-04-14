@@ -46,7 +46,7 @@ interface ProfileClientProps {
   topGenres: { name: string; value: number }[];
   followers: UserSmall[];
   following: UserSmall[];
-  dict: any;
+  dict: ReturnType<typeof import("@/lib/i18n").getDictionarySync>;
   lang: string;
 }
 
@@ -133,7 +133,7 @@ export function ProfileClient({
                     }
                   }}
                   onUploadError={(error: Error) => {
-                    alert(`Ошибка загрузки: ${error.message}`);
+                    alert(`${dict.common.error}: ${error.message}`);
                   }}
                   appearance={{
                     button: "bg-dark-border text-xs px-2 py-1 max-h-8 rounded",

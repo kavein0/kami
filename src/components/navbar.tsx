@@ -18,21 +18,22 @@ import { useState, useEffect, useTransition } from "react";
 import { logoutAction, setLanguage } from "@/app/actions";
 import { GlobalSearch } from "./global-search";
 
-export function Navbar({ lang, dict }: { lang: string, dict: Record<string, string> }) {
+interface NavUser {
+  name: string | null;
+  image: string | null;
+}
+
+interface NavbarProps {
+  lang: string;
+  dict: Record<string, string>;
+  user: NavUser | null;
+}
+
+export function Navbar({ lang, dict, user }: NavbarProps) {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [session, setSession] = useState<{ user?: { name?: string | null; email?: string | null } } | null>(null);
   const [isPendingLang, startTransitionLang] = useTransition();
-
-  useEffect(() => {
-    fetch("/api/auth/session")
-      .then((r) => r.json())
-      .then((s) => {
-        if (s?.user) setSession(s);
-      })
-      .catch(() => {});
-  }, [pathname]);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -110,14 +111,14 @@ export function Navbar({ lang, dict }: { lang: string, dict: Record<string, stri
             >
                {isPendingLang ? <Loader2 className="w-4 h-4 animate-spin text-neon-cyan" /> : lang.toUpperCase()}
             </button>
-            {session?.user ? (
+            {user ? (
               <>
                 <Link
                   href="/profile"
                   className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm text-dark-muted hover:text-dark-text transition-colors"
                 >
                   <User className="w-4 h-4" />
-                  <span>{session.user.name || dict.profile}</span>
+                  <span>{user.name || dict.profile}</span>
                 </Link>
                 <form action={logoutAction}>
                   <button
@@ -182,7 +183,7 @@ export function Navbar({ lang, dict }: { lang: string, dict: Record<string, stri
                 </span>
                 Language / Язык
               </button>
-              {session?.user ? (
+              {user ? (
                 <>
                   <Link
                     href="/profile"

@@ -1,18 +1,22 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { getToken } from "next-auth/jwt";
 
 const protectedRoutes = ["/profile", "/my-list"];
 const authRoutes = ["/login", "/register"];
 
-export function proxy(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
-  // Check for auth session via NextAuth JWT cookie
-  const sessionToken =
-    req.cookies.get("miruverse-session")?.value ||
-    req.cookies.get("__Secure-miruverse-session")?.value;
+  // Validate the session by cryptographically verifying the JWT token,
+  // rather than just checking for a cookie's existence
+  const token = await getToken({
+    req,
+    secret: process.env.AUTH_SECRET,
+    cookieName: "miruverse-session",
+  });
 
-  const isLoggedIn = !!sessionToken;
+  const isLoggedIn = !!token;
 
   // Redirect unauthenticated users away from protected routes
   if (protectedRoutes.some((route) => pathname.startsWith(route))) {
@@ -40,5 +44,5 @@ export function proxy(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico|.*\\..*).*)" ],
+  matcher: ["/((?!api|_next/static|_next/image|favicon.ico|.*\\..*).*)"],
 };

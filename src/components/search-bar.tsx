@@ -3,10 +3,12 @@
 import { useState, useTransition } from "react";
 import { Search } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useDictionary } from "./dictionary-provider";
 
 export function SearchBar() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const dict = useDictionary();
   const [query, setQuery] = useState(searchParams.get("q") || "");
   const [isPending, startTransition] = useTransition();
 
@@ -34,7 +36,7 @@ export function SearchBar() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Поиск по названию..."
+            placeholder={dict.browse.searchPlaceholder}
             className="w-full pl-12 pr-4 py-3.5 rounded-2xl bg-dark-card border border-dark-border text-dark-text placeholder:text-dark-muted focus:outline-none focus:border-neon-cyan/50 focus:ring-1 focus:ring-neon-cyan/20 transition-all"
           />
         </div>
@@ -46,7 +48,7 @@ export function SearchBar() {
           {isPending ? (
             <div className="w-5 h-5 border-2 border-dark-bg/30 border-t-dark-bg rounded-full animate-spin" />
           ) : (
-            "Найти"
+            dict.common.search
           )}
         </button>
       </div>

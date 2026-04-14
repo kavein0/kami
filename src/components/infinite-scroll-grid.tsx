@@ -6,6 +6,8 @@ import { TitleData } from "@/lib/types";
 import { loadMoreTitles } from "@/app/actions";
 import { useDictionary } from "./dictionary-provider";
 
+const PAGE_SIZE = 24;
+
 interface Props {
   initialTitles: TitleData[];
   q?: string;
@@ -19,7 +21,7 @@ export function InfiniteScrollGrid({ initialTitles, q, tab, genre, year, sort }:
   const dict = useDictionary();
   const [titles, setTitles] = useState<TitleData[]>(initialTitles);
   const [isLoading, setIsLoading] = useState(false);
-  const [hasMore, setHasMore] = useState(initialTitles.length >= 20);
+  const [hasMore, setHasMore] = useState(initialTitles.length >= PAGE_SIZE);
 
   const pageRef = useRef(1);
   const observerTarget = useRef<HTMLDivElement>(null);
@@ -29,11 +31,11 @@ export function InfiniteScrollGrid({ initialTitles, q, tab, genre, year, sort }:
     // Reset state if initialTitles changes (e.g. user typed a new search)
     setTitles(initialTitles);
     pageRef.current = 1;
-    setHasMore(initialTitles.length >= 20);
+    setHasMore(initialTitles.length >= PAGE_SIZE);
   }, [initialTitles, q, tab, genre, year, sort]);
 
   const fetchMore = useCallback(async () => {
-    if (isFetchingRef.current) return;
+    if (isFetchingRef.current || !hasMore) return;
     setIsLoading(true);
     isFetchingRef.current = true;
     const nextPage = pageRef.current + 1;
@@ -46,17 +48,29 @@ export function InfiniteScrollGrid({ initialTitles, q, tab, genre, year, sort }:
         year,
         sort
       });
+
       if (moreTitles.length === 0) {
         setHasMore(false);
       } else {
+        // If we got fewer than a full page, this is the last page
+        if (moreTitles.length < PAGE_SIZE) {
+          setHasMore(false);
+        }
+
         setTitles((prev) => {
           // Deduplicate based on title id to prevent infinite scroll bugs
           const existingIds = new Set(prev.map(t => t.id));
           const uniques = moreTitles.filter(t => !existingIds.has(t.id));
+
+          // If all returned items are duplicates, stop loading
+          if (uniques.length === 0) {
+            setHasMore(false);
+            return prev;
+          }
+
           return [...prev, ...uniques];
         });
         pageRef.current = nextPage;
-        if (moreTitles.length < 20) setHasMore(false);
       }
     } catch (e) {
       console.error(e);
@@ -65,12 +79,12 @@ export function InfiniteScrollGrid({ initialTitles, q, tab, genre, year, sort }:
       setIsLoading(false);
       isFetchingRef.current = false;
     }
-  }, [q, tab, genre, year, sort]);
+  }, [q, tab, genre, year, sort, hasMore]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && !isLoading && !isFetchingRef.current) {
+        if (entries[0].isIntersecting && hasMore && !isLoading && !isFetchingRef.current) {
           fetchMore();
         }
       },
@@ -82,7 +96,7 @@ export function InfiniteScrollGrid({ initialTitles, q, tab, genre, year, sort }:
       observer.observe(target);
     }
     return () => observer.disconnect();
-  }, [fetchMore, isLoading]);
+  }, [fetchMore, isLoading, hasMore]);
 
   if (titles.length === 0) {
     return (

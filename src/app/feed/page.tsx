@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 import { auth } from "@/lib/auth";
 import { formatDistanceToNow } from "date-fns";
 import { ru, enUS } from "date-fns/locale";
@@ -6,9 +7,17 @@ import { getDictionary, getLanguage } from "@/lib/i18n";
 import Link from "next/link";
 import Image from "next/image";
 import { STATUS_LABELS, STATUS_COLORS } from "@/lib/types";
-import { Star } from "lucide-react";
+import { Star, Play, Eye, Clock, XCircle, Pause, MessageSquare } from "lucide-react";
 
 export const revalidate = 60; // 1 minute caching for the feed
+
+const STATUS_ICONS: Record<string, typeof Play> = {
+  watching: Play,
+  watched: Eye,
+  plan_to_watch: Clock,
+  dropped: XCircle,
+  on_hold: Pause,
+};
 
 export default async function FeedPage() {
   const session = await auth();
@@ -55,7 +64,7 @@ export default async function FeedPage() {
 
   // Fetch recent Reviews
   const recentReviews = await prisma.review.findMany({
-    where: reviewsWhere as any,
+    where: reviewsWhere as Prisma.ReviewWhereInput,
     take: 20,
     orderBy: { createdAt: "desc" },
     include: {
@@ -104,6 +113,7 @@ export default async function FeedPage() {
                  const statusKey = STATUS_LABELS[entry.status as keyof typeof STATUS_LABELS] || entry.status;
                  const statusLabel = (dict.list as Record<string, string>)[statusKey] || statusKey;
                  const statusColor = STATUS_COLORS[entry.status as keyof typeof STATUS_COLORS] || "#ffffff";
+                 const StatusIcon = STATUS_ICONS[entry.status] || Play;
 
                  return (
                    <div key={`entry-${entry.id}-${i}`} className="glass-strong rounded-2xl p-5 border border-dark-border flex gap-4">
@@ -124,7 +134,23 @@ export default async function FeedPage() {
                          <span className="text-dark-muted mx-1">{dict.feed.to}</span>
                          <span className="font-semibold" style={{ color: statusColor }}>{statusLabel}</span>
                        </div>
-                       <div className="text-xs text-dark-muted mt-1">{timeAgo}</div>
+                       {/* Action badges */}
+                       <div className="flex flex-wrap gap-2 mt-2">
+                         <span
+                           className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full border"
+                           style={{ color: statusColor, borderColor: `${statusColor}33`, backgroundColor: `${statusColor}15` }}
+                         >
+                           <StatusIcon className="w-3 h-3" />
+                           {statusLabel}
+                         </span>
+                         {entry.score && entry.score > 0 && (
+                           <span className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full bg-neon-yellow/10 text-neon-yellow border border-neon-yellow/20">
+                             <Star className="w-3 h-3 fill-current" />
+                             {entry.score}/10
+                           </span>
+                         )}
+                       </div>
+                       <div className="text-xs text-dark-muted mt-2">{timeAgo}</div>
                      </div>
                      {title.poster && (
                        <Link href={`/title/${title.id}`}>
@@ -157,11 +183,18 @@ export default async function FeedPage() {
                          <span className="text-dark-muted mx-1">{dict.feed.reviewed}</span>
                          <Link href={`/title/${title.id}`} className="font-semibold text-white hover:underline">{title.name}</Link>
                        </div>
-                       {review.rating && (
-                         <div className="flex items-center gap-1 text-neon-yellow mb-2 text-sm bg-neon-yellow/10 w-max px-2 py-0.5 rounded-full border border-neon-yellow/20">
-                           <Star className="w-4 h-4 fill-current" /> {review.rating}/10
-                         </div>
-                       )}
+                       {/* Action badges */}
+                       <div className="flex flex-wrap gap-2 mb-2">
+                         <span className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full bg-neon-purple/10 text-neon-purple border border-neon-purple/20">
+                           <MessageSquare className="w-3 h-3" />
+                           {dict.details.reviews}
+                         </span>
+                         {review.rating && (
+                           <span className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full bg-neon-yellow/10 text-neon-yellow border border-neon-yellow/20">
+                             <Star className="w-4 h-4 fill-current" /> {review.rating}/10
+                           </span>
+                         )}
+                       </div>
                        <p className="text-sm text-gray-300 italic">«{review.content.length > 150 ? review.content.substring(0, 150) + "..." : review.content}»</p>
                        <div className="text-xs text-dark-muted mt-2">{timeAgo}</div>
                      </div>

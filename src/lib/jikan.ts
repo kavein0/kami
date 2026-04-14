@@ -104,7 +104,7 @@ function stripBBCode(text: string): string {
   if (!text) return "";
   return text
     .replace(/\[\[([^\]]*?)\]\]/g, "$1") // [[character]] links — keep the name text
-    .replace(/\[([a-z_]+?)(?:=[^\]]+?)?\](.*?)\[\/\1\]/gs, "$2") // [b]text[/b], [url=...]text[/url]
+    .replace(/\[([a-z_]+?)(?:=[^\]]+?)?\]([\s\S]*?)\[\/\1\]/g, "$2") // [b]text[/b], [url=...]text[/url]
     .replace(/\[([a-z_]+?)(?:=[^\]]+?)?\]/g, "") // standalone [tag]
     .replace(/\[\/[a-z_]+?\]/g, "") // standalone [/tag]
     .trim();

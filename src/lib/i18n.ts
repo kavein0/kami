@@ -52,6 +52,7 @@ export const dictionaries = {
       emptyDesc: "Try changing the filters or your search query",
       viewAll: "View all results",
       noResults: "No results found",
+      selected: "selected",
     },
     list: {
       title: "My List",
@@ -380,6 +381,7 @@ export const dictionaries = {
       emptyDesc: "Попробуйте изменить фильтры или поисковый запрос",
       viewAll: "Все результаты",
       noResults: "Ничего не найдено",
+      selected: "выбрано",
     },
     list: {
       title: "Мой список",

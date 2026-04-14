@@ -5,6 +5,7 @@ import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { TitleCard } from "./title-card";
 import type { TitleData } from "@/lib/types";
+import { useDictionary } from "./dictionary-provider";
 
 interface TitleSectionProps {
   title: string;
@@ -14,6 +15,8 @@ interface TitleSectionProps {
 }
 
 export function TitleSection({ title, icon, titles, href }: TitleSectionProps) {
+  const dict = useDictionary();
+
   return (
     <section className="py-8">
       <div className="flex items-center justify-between mb-6">
@@ -33,7 +36,7 @@ export function TitleSection({ title, icon, titles, href }: TitleSectionProps) {
             href={href}
             className="flex items-center gap-1 text-sm text-dark-muted hover:text-neon-cyan transition-colors"
           >
-            Все
+            {dict.browse.viewAll}
             <ChevronRight className="w-4 h-4" />
           </Link>
         )}

@@ -28,8 +28,7 @@ if (dbUrl.includes("pooler.supabase.com")) {
   }
 }
 
-// Защита сертификата (важно для Supabase / Vercel Serverless в некоторых регионах)
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+// TLS: enforce certificate validation in production, relax only for local dev
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
@@ -38,7 +37,7 @@ const globalForPrisma = globalThis as unknown as {
 function createPrismaClient() {
   const pool = new Pool({
     connectionString: dbUrl,
-    ssl: { rejectUnauthorized: false },
+    ssl: { rejectUnauthorized: process.env.NODE_ENV === "production" },
     max: 1, // Required for Vercel Serverless
     allowExitOnIdle: true, // Prevents event loop hangs when freezing
     connectionTimeoutMillis: 5000,
