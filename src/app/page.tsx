@@ -7,7 +7,7 @@ import { getDictionary } from "@/lib/i18n";
 import { ANIME_GENRES } from "@/lib/types";
 import { ClientPageTransition } from "@/components/client-page-transition";
 import { auth } from "@/lib/auth";
-import { getPersonalizedRecommendations } from "@/lib/recommendations";
+import { getActivityFeedTitles } from "@/lib/recommendations";
 
 export default async function HomePage() {
   const session = await auth();
@@ -18,14 +18,14 @@ export default async function HomePage() {
 
   // Run all independent fetch requests in parallel for massive performance boost
   const [
-    recommended,
+    activityTitles,
     { results: topAnime },
     { results: topMovies },
     { results: topSeries },
     dict,
     { results: heroPool }
   ] = await Promise.all([
-    getPersonalizedRecommendations(session?.user?.id),
+    getActivityFeedTitles(session?.user?.id),
     getPopularAnime({ sortBy: "members", page: 1 }),
     getPopularTitles("movie", { sortBy: "popularity.desc", page: 1 }),
     getPopularTitles("tv", { sortBy: "popularity.desc", filterAnime: false, page: 1 }),
@@ -62,8 +62,8 @@ export default async function HomePage() {
         <TitleSection
           title={dict.feed.title || "For You"}
           icon={<Sparkles className="w-6 h-6 text-neon-cyan animate-pulse-neon" />}
-          titles={recommended}
-          href="/browse"
+          titles={activityTitles.slice(0, 8)}
+          href="/feed"
         />
         <TitleSection
           title={dict.home.popularAnime}

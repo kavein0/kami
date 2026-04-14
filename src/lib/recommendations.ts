@@ -59,3 +59,52 @@ export async function getPersonalizedRecommendations(userId?: string) {
 
   return recommended.slice(0, 8);
 }
+
+export async function getActivityFeedTitles(userId?: string) {
+  let relevantUserIds: string[] | undefined;
+
+  if (userId) {
+    const me = await prisma.user.findUnique({
+      where: { id: userId },
+      include: { following: true },
+    });
+
+    if (me) {
+      relevantUserIds = [userId, ...me.following.map((f) => f.followingId)];
+    }
+  }
+
+  const listEntries = await prisma.listEntry.findMany({
+    where: relevantUserIds ? { userId: { in: relevantUserIds } } : undefined,
+    include: { title: true },
+    orderBy: { updatedAt: "desc" },
+    take: 60,
+  });
+
+  const reviews = await prisma.review.findMany({
+    where: relevantUserIds ? { userId: { in: relevantUserIds } } : undefined,
+    include: { title: true },
+    orderBy: { createdAt: "desc" },
+    take: 60,
+  });
+
+  const activity = [
+    ...listEntries.map((entry) => ({ date: entry.updatedAt, title: entry.title })),
+    ...reviews.map((review) => ({ date: review.createdAt, title: review.title })),
+  ].sort((a, b) => b.date.getTime() - a.date.getTime());
+
+  const uniqueByTitleId = new Map<string, (typeof activity)[number]["title"]>();
+  for (const item of activity) {
+    if (!uniqueByTitleId.has(item.title.id)) {
+      uniqueByTitleId.set(item.title.id, item.title);
+    }
+    if (uniqueByTitleId.size >= 8) break;
+  }
+
+  const titles = Array.from(uniqueByTitleId.values());
+  if (titles.length >= 8) return titles;
+
+  const { results } = await getPopularAnime({ sortBy: "score", page: 1 });
+  const padding = results.filter((r) => !uniqueByTitleId.has(r.id)).slice(0, 8 - titles.length);
+  return [...titles, ...padding];
+}
