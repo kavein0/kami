@@ -6,6 +6,7 @@ import bcrypt from "bcryptjs";
 import { getDictionary } from "@/lib/i18n";
 import emailValidator from "deep-email-validator";
 import { z } from "zod";
+import { redirect } from "next/navigation";
 
 const registerSchema = z.object({
   name: z.string().min(1).max(100).trim(),
@@ -123,5 +124,6 @@ export async function loginAction(formData: FormData) {
 }
 
 export async function logoutAction() {
-  await signOut({ redirectTo: "/login" });
+  await signOut({ redirect: false });
+  redirect("/login");
 }
