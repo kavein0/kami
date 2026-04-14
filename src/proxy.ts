@@ -9,8 +9,8 @@ export function proxy(req: NextRequest) {
 
   // Check for auth session via NextAuth JWT cookie
   const sessionToken =
-    req.cookies.get("kamilist-session")?.value ||
-    req.cookies.get("__Secure-kamilist-session")?.value;
+    req.cookies.get("miruverse-session")?.value ||
+    req.cookies.get("__Secure-miruverse-session")?.value;
 
   const isLoggedIn = !!sessionToken;
 

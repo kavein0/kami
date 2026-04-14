@@ -19,9 +19,9 @@ export async function generateMetadata({ params }: TitlePageProps): Promise<Meta
   } else {
     title = await getTitleDetail(id);
   }
-  if (!title) return { title: "Not Found — KamiList" };
+  if (!title) return { title: "Not Found — MiruVerse" };
 
-  const baseUrl = process.env.NEXTAUTH_URL || "https://kamilist.vercel.app";
+  const baseUrl = process.env.NEXTAUTH_URL || "https://miruverse.vercel.app";
   const ogImageUrl = new URL("/api/og", baseUrl);
   ogImageUrl.searchParams.set("title", title.name);
   if (title.backdrop || title.poster) {
@@ -29,10 +29,10 @@ export async function generateMetadata({ params }: TitlePageProps): Promise<Meta
   }
 
   return {
-    title: `${title.name} — KamiList`,
-    description: title.description || `${title.name} on KamiList`,
+    title: `${title.name} — MiruVerse`,
+    description: title.description || `${title.name} on MiruVerse`,
     openGraph: {
-      title: `${title.name} — KamiList`,
+      title: `${title.name} — MiruVerse`,
       description: title.description || undefined,
       images: [
         {
@@ -45,7 +45,7 @@ export async function generateMetadata({ params }: TitlePageProps): Promise<Meta
     },
     twitter: {
       card: "summary_large_image",
-      title: `${title.name} — KamiList`,
+      title: `${title.name} — MiruVerse`,
       description: title.description || undefined,
       images: [ogImageUrl.toString()],
     },

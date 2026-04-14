@@ -36,10 +36,12 @@ export function RegisterForm({ dict }: Props) {
         setError(result.error);
         setLoading(false);
       } else {
-        router.push("/");
+        router.replace("/");
+        router.refresh();
       }
     } catch {
-      router.push("/");
+      setError(dict.auth.errorGeneric);
+      setLoading(false);
     }
   };
 
@@ -69,7 +71,7 @@ export function RegisterForm({ dict }: Props) {
             </motion.div>
             <h1 className="text-2xl font-bold text-white">{dict.auth.registerTitle}</h1>
             <p className="text-dark-muted text-sm mt-1">
-              {dict.auth.registerSubtitle || "Join KamiList"}
+              {dict.auth.registerSubtitle || "Join MiruVerse"}
             </p>
           </div>
 

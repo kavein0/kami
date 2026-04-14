@@ -34,7 +34,7 @@ export async function GET(req: NextRequest) {
                 textShadow: "0 0 40px rgba(0,240,255,0.8)",
               }}
             >
-              KamiList
+              MiruVerse
             </h1>
             <p style={{ color: "#e0e0ee", fontSize: 40, marginTop: 20 }}>
               Tracker for Anime & Movies
@@ -78,7 +78,7 @@ export async function GET(req: NextRequest) {
           >
             <div style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
               <div style={{ padding: '8px 16px', background: 'rgba(0,240,255,0.1)', border: '2px solid #00f0ff', borderRadius: 8, color: '#00f0ff', fontSize: 24, fontWeight: 'bold' }}>
-                KamiList
+                MiruVerse
               </div>
             </div>
             
@@ -97,7 +97,7 @@ export async function GET(req: NextRequest) {
             </h1>
             
             <p style={{ color: "#00f0ff", fontSize: 32, marginTop: 20 }}>
-              Check out on KamiList ✨
+              Check out on MiruVerse ✨
             </p>
           </div>
           

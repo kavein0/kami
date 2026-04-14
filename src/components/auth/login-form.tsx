@@ -30,11 +30,12 @@ export function LoginForm({ dict }: Props) {
         setError(result.error);
         setLoading(false);
       } else {
-        router.push("/");
+        router.replace("/");
+        router.refresh();
       }
     } catch {
-      // NextAuth redirects on success, which throws
-      router.push("/");
+      setError(dict.auth.errorGeneric);
+      setLoading(false);
     }
   };
 
@@ -64,7 +65,7 @@ export function LoginForm({ dict }: Props) {
             </motion.div>
             <h1 className="text-2xl font-bold text-white">{dict.auth.loginTitle}</h1>
             <p className="text-dark-muted text-sm mt-1">
-              {dict.auth.loginSubtitle || "Log in to your KamiList account"}
+              {dict.auth.loginSubtitle || "Log in to your MiruVerse account"}
             </p>
           </div>
 

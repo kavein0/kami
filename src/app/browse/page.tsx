@@ -7,7 +7,7 @@ import { ANIME_GENRES, MOVIE_GENRES, SERIES_GENRES, GenreConfig } from "@/lib/ty
 import { DropdownFilter } from "@/components/dropdown-filter";
 import Link from "next/link";
 import { GenreTooltip } from "@/components/genre-tooltip";
-import { getDictionary } from "@/lib/i18n";
+import { getDictionary, getLanguage } from "@/lib/i18n";
 
 interface BrowsePageProps {
   searchParams: Promise<{
@@ -23,6 +23,7 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
   const params = await searchParams;
   const { q, genre, year, sort } = params;
   let tab = params.tab;
+  const lang = await getLanguage();
   const dict = await getDictionary();
 
   // Set default tab to anime ONLY if we are not searching
@@ -163,7 +164,9 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
                 multiSelect={true}
                 options={currentTabObj.genres.map((g) => {
                   const localizedLabel = (dict.genres as Record<string, string>)[g.name] || g.name;
-                  const localizedDesc = (dict.genreDescriptions as Record<string, string>)?.[g.name] || g.description;
+                  const localizedDesc =
+                    (dict.genreDescriptions as Record<string, string>)?.[g.name] ||
+                    (lang === "en" ? `${localizedLabel} genre` : g.description);
                   return {
                     label: localizedLabel,
                     value: g.name,

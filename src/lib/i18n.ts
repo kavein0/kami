@@ -134,7 +134,7 @@ export const dictionaries = {
       to: "to",
       reviewed: "wrote a review for",
       empty: "Feed is empty. Follow some users to see their activity!",
-      emptyGuest: "Join KamiList and follow your friends to see their activity here!",
+      emptyGuest: "Join MiruVerse and follow your friends to see their activity here!",
     },
     genres: {
       // Russian -> English (TMDB backward compat)
@@ -267,8 +267,8 @@ export const dictionaries = {
       errorEmailExists: "Email is already registered",
       errorGeneric: "Something went wrong",
       passwordMin: "Password must be at least 6 characters",
-      loginSubtitle: "Log in to your KamiList account",
-      registerSubtitle: "Join KamiList",
+      loginSubtitle: "Log in to your MiruVerse account",
+      registerSubtitle: "Join MiruVerse",
       errorEmailInvalid: "Invalid or disposable email address",
       errorCredentials: "Invalid email or password",
     }
@@ -518,8 +518,8 @@ export const dictionaries = {
       errorEmailExists: "Этот email уже зарегистрирован",
       errorGeneric: "Что-то пошло не так",
       passwordMin: "Пароль должен быть не менее 6 символов",
-      loginSubtitle: "Войдите в свой аккаунт KamiList",
-      registerSubtitle: "Присоединяйтесь к KamiList",
+      loginSubtitle: "Войдите в свой аккаунт MiruVerse",
+      registerSubtitle: "Присоединяйтесь к MiruVerse",
       errorEmailInvalid: "Неверный или одноразовый email адрес",
       errorCredentials: "Неверный email или пароль",
     }
@@ -529,7 +529,7 @@ export const dictionaries = {
 // Next.js headers() and cookies() can only be called from Server Components or Server Actions
 export async function getLanguage(): Promise<Language> {
   const cookieStore = await cookies();
-  const lang = cookieStore.get("kamilist-lang")?.value;
+  const lang = cookieStore.get("miruverse-lang")?.value;
   if (lang === "en") return "en";
   return "ru";
 }

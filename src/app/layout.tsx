@@ -16,11 +16,11 @@ export async function generateMetadata(): Promise<Metadata> {
   const dict = await getDictionary();
   
   return {
-    title: `KamiList — ${dict.home.footerNote.split(' ').slice(0, 3).join(' ')}`,
+    title: `MiruVerse — ${dict.home.footerNote.split(' ').slice(0, 3).join(' ')}`,
     description: dict.browse.subtitle,
-    keywords: ["anime", "movies", "tracker", "list", "KamiList"],
+    keywords: ["anime", "movies", "tracker", "list", "MiruVerse"],
     openGraph: {
-      title: "KamiList",
+      title: "MiruVerse",
       description: dict.browse.subtitle,
       type: "website",
       locale: lang === "ru" ? "ru_RU" : "en_US",

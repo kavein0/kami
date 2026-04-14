@@ -113,8 +113,9 @@ export async function registerAction(formData: FormData) {
     await signIn("credentials", {
       email,
       password,
-      redirectTo: "/",
+      redirect: false,
     });
+    return { success: true };
   } catch (error) {
     console.error("Registration error:", error);
     return { error: dict.auth.errorGeneric };
@@ -134,8 +135,9 @@ export async function loginAction(formData: FormData) {
     await signIn("credentials", {
       email,
       password,
-      redirectTo: "/",
+      redirect: false,
     });
+    return { success: true };
   } catch (error: unknown) {
     if (error && typeof error === "object" && "type" in error && (error as { type: string }).type === "CredentialsSignin") {
       return { error: dict.auth.errorCredentials || "Invalid credentials" };
@@ -414,7 +416,7 @@ export async function toggleFollow(targetUserId: string) {
 
 export async function setLanguage(lang: "ru" | "en") {
   const cookieStore = await cookies();
-  cookieStore.set("kamilist-lang", lang, { maxAge: 60 * 60 * 24 * 365, path: "/" });
+  cookieStore.set("miruverse-lang", lang, { maxAge: 60 * 60 * 24 * 365, path: "/" });
   revalidatePath("/");
 }
 

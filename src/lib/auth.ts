@@ -61,7 +61,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
   cookies: {
     sessionToken: {
-      name: "kamilist-session",
+      name: "miruverse-session",
       options: {
         httpOnly: true,
         sameSite: "lax",
@@ -70,7 +70,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       },
     },
     csrfToken: {
-      name: "kamilist-csrf",
+      name: "miruverse-csrf",
       options: {
         httpOnly: true,
         sameSite: "lax",

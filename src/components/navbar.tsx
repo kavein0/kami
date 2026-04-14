@@ -68,7 +68,7 @@ export function Navbar({ lang, dict }: { lang: string, dict: Record<string, stri
               <Sparkles className="w-7 h-7 text-neon-cyan" />
             </motion.div>
             <span className="text-xl font-bold bg-gradient-to-r from-neon-cyan to-neon-pink bg-clip-text text-transparent">
-              KamiList
+              MiruVerse
             </span>
           </Link>
 

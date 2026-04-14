@@ -111,7 +111,7 @@ export default async function HomePage() {
         {/* Footer */}
         <footer className="border-t border-dark-border py-8 text-center mt-20 relative z-10 glass-strong rounded-t-3xl border-b-0">
           <p className="text-dark-muted text-sm tracking-wide">
-            © {new Date().getFullYear()} <span className="text-neon-cyan font-semibold font-heading tracking-wider">KamiList</span>. {dict.home.footerRights}
+            © {new Date().getFullYear()} <span className="text-neon-cyan font-semibold font-heading tracking-wider">MiruVerse</span>. {dict.home.footerRights}
           </p>
           <p className="text-dark-muted/50 text-xs mt-2 uppercase tracking-widest font-semibold">
             {dict.home.footerNote}

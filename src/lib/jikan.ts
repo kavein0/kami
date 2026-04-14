@@ -121,7 +121,7 @@ async function fetchShikimoriRussian(malIds: number[]): Promise<Map<number, { ru
   try {
     const url = `${SHIKIMORI_BASE}/api/animes?ids=${malIds.join(",")}&limit=50`;
     const res = await fetch(url, {
-      headers: { "User-Agent": "KamiList/1.0" },
+      headers: { "User-Agent": "MiruVerse/1.0" },
       next: { revalidate: 86400 } // 24h cache
     });
 
@@ -148,7 +148,7 @@ async function fetchShikimoriDetail(malId: number): Promise<{ russian: string; d
   try {
     const url = `${SHIKIMORI_BASE}/api/animes/${malId}`;
     const res = await fetch(url, {
-      headers: { "User-Agent": "KamiList/1.0" },
+      headers: { "User-Agent": "MiruVerse/1.0" },
       next: { revalidate: 86400 }
     });
 
