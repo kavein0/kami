@@ -2,9 +2,12 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import { TitleCard } from "./title-card";
+import { TitleListItem } from "./title-list-item";
+import { SkeletonGrid } from "./skeleton-card";
 import { TitleData } from "@/lib/types";
 import { loadMoreTitles } from "@/app/actions/browse";
 import { useDictionary } from "./dictionary-provider";
+import { ViewModeToggle } from "./view-mode-toggle";
 
 const PAGE_SIZE = 24;
 
@@ -22,13 +25,25 @@ export function InfiniteScrollGrid({ initialTitles, q, tab, genre, year, sort }:
   const [titles, setTitles] = useState<TitleData[]>(initialTitles);
   const [isLoading, setIsLoading] = useState(false);
   const [hasMore, setHasMore] = useState(initialTitles.length >= PAGE_SIZE);
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
   const pageRef = useRef(1);
   const observerTarget = useRef<HTMLDivElement>(null);
   const isFetchingRef = useRef(false);
 
+  // Initialize viewMode from localStorage
   useEffect(() => {
-    // Reset state if initialTitles changes (e.g. user typed a new search)
+    const saved = localStorage.getItem("miruverse_view_mode") as "grid" | "list";
+    if (saved) setViewMode(saved);
+  }, []);
+
+  const handleViewModeChange = (mode: "grid" | "list") => {
+    setViewMode(mode);
+    localStorage.setItem("miruverse_view_mode", mode);
+  };
+
+  useEffect(() => {
+    // Reset state if filters change
     setTitles(initialTitles);
     pageRef.current = 1;
     setHasMore(initialTitles.length >= PAGE_SIZE);
@@ -52,22 +67,17 @@ export function InfiniteScrollGrid({ initialTitles, q, tab, genre, year, sort }:
       if (moreTitles.length === 0) {
         setHasMore(false);
       } else {
-        // If we got fewer than a full page, this is the last page
         if (moreTitles.length < PAGE_SIZE) {
           setHasMore(false);
         }
 
         setTitles((prev) => {
-          // Deduplicate based on title id to prevent infinite scroll bugs
           const existingIds = new Set(prev.map(t => t.id));
           const uniques = moreTitles.filter(t => !existingIds.has(t.id));
-
-          // If all returned items are duplicates, stop loading
           if (uniques.length === 0) {
             setHasMore(false);
             return prev;
           }
-
           return [...prev, ...uniques];
         });
         pageRef.current = nextPage;
@@ -88,7 +98,7 @@ export function InfiniteScrollGrid({ initialTitles, q, tab, genre, year, sort }:
           fetchMore();
         }
       },
-      { rootMargin: '400px' }
+      { rootMargin: '600px' }
     );
 
     const target = observerTarget.current;
@@ -100,8 +110,8 @@ export function InfiniteScrollGrid({ initialTitles, q, tab, genre, year, sort }:
 
   if (titles.length === 0) {
     return (
-      <div className="text-center py-20">
-        <div className="text-6xl mb-4">🔍</div>
+      <div className="text-center py-20 bg-dark-card/30 rounded-3xl border border-dark-border mt-8">
+        <div className="text-6xl mb-4 grayscale opacity-50">🔍</div>
         <h3 className="text-xl font-semibold text-dark-text mb-2">
           {dict.browse.emptyState}
         </h3>
@@ -113,21 +123,32 @@ export function InfiniteScrollGrid({ initialTitles, q, tab, genre, year, sort }:
   }
 
   return (
-    <div className="mt-8">
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-        {titles.map((title, i) => (
-          <TitleCard key={`${title.id}-${i}`} title={title} index={i} />
-        ))}
+    <div className="mt-8 space-y-6">
+      {/* List controls */}
+      <div className="flex justify-end pr-1">
+        <ViewModeToggle viewMode={viewMode} onViewModeChange={handleViewModeChange} />
       </div>
+
+      {viewMode === "grid" ? (
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+          {titles.map((title, i) => (
+            <TitleCard key={`${title.id}-${i}`} title={title} index={i} />
+          ))}
+          {isLoading && <SkeletonGrid />}
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {titles.map((title, i) => (
+            <TitleListItem key={`${title.id}-${i}`} title={title} index={i} />
+          ))}
+          {isLoading && [...Array(6)].map((_, i) => (
+            <div key={i} className="h-44 w-full bg-dark-card/50 rounded-2xl animate-pulse" />
+          ))}
+        </div>
+      )}
       
       {hasMore && (
-        <div ref={observerTarget} className="flex justify-center py-10 mt-4">
-          {isLoading && (
-            <div className="w-8 h-8 flex items-center justify-center">
-              <div className="w-full h-full border-4 border-dark-border border-t-neon-cyan rounded-full animate-spin"></div>
-            </div>
-          )}
-        </div>
+        <div ref={observerTarget} className="h-10 invisible" />
       )}
     </div>
   );

@@ -6,8 +6,9 @@ import { InfiniteScrollGrid } from "@/components/infinite-scroll-grid";
 import { ANIME_GENRES, MOVIE_GENRES, SERIES_GENRES, GenreConfig } from "@/lib/types";
 import { DropdownFilter } from "@/components/dropdown-filter";
 import Link from "next/link";
-import { GenreTooltip } from "@/components/genre-tooltip";
 import { getDictionary } from "@/lib/i18n";
+import { ActiveFilters } from "@/components/active-filters";
+import { ScrollToTop } from "@/components/scroll-to-top";
 
 interface BrowsePageProps {
   searchParams: Promise<{
@@ -59,7 +60,10 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
           if (ids.length > 0) genreIds = ids.join(",");
         }
         
-        const sortMal = sort === "rating_desc" ? "score" : "members";
+        let sortMal = "members";
+        if (sort === "rating_desc") sortMal = "score";
+        if (sort === "date_asc") sortMal = "start_date";
+        if (sort === "date_desc") sortMal = "start_date";
         
         const res = await getPopularAnime({
             page: 1,
@@ -85,6 +89,7 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
         const sortConfig = 
           sort === "rating_desc" ? "vote_average.desc" : 
           sort === "date_desc" ? (fetchType === "tv" ? "first_air_date.desc" : "primary_release_date.desc") : 
+          sort === "date_asc" ? (fetchType === "tv" ? "first_air_date.asc" : "primary_release_date.asc") :
           "popularity.desc";
 
         const res = await getPopularTitles(fetchType, {
@@ -104,7 +109,7 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
     titles = titles.filter((t) => t.year === parseInt(year));
   }
   
-  const hasFilters = q || tab || genre || year;
+  const hasFilters = q || tab || genre || year || sort;
 
   const tabs = [
     { id: "anime", label: dict.browse.tabAnime, genres: ANIME_GENRES },
@@ -130,13 +135,13 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
         </div>
 
         {/* Search */}
-        <Suspense fallback={<div className="h-14 skeleton rounded-2xl" />}>
+        <Suspense fallback={<div className="h-14 bg-dark-card/50 rounded-2xl animate-pulse" />}>
           <SearchBar />
         </Suspense>
 
         {/* TABS & GENRES */}
         {!q && (
-          <div className="mt-8 mb-8">
+          <div className="mt-8 mb-4">
             <div className="flex overflow-x-auto hide-scrollbar border-b border-dark-border mb-6">
               {tabs.map((t) => (
                 <Link
@@ -180,14 +185,19 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
                 options={[
                   { label: dict.browse.sortRating, value: "rating_desc" },
                   { label: dict.browse.sortDate, value: "date_desc" },
+                  { label: dict.browse.sortDateOldest || "Oldest First", value: "date_asc" },
                 ]}
               />
             </div>
           </div>
         )}
 
+        <Suspense>
+           <ActiveFilters />
+        </Suspense>
+
         {hasFilters && (
-          <div className="mt-6 mb-4 flex items-center justify-between flex-wrap gap-4">
+          <div className="mt-6 mb-4 flex items-center justify-between flex-wrap gap-4 border-t border-dark-border/50 pt-6">
             <p className="text-dark-muted text-sm">
               {dict.browse.foundPrefix} <span className="text-neon-cyan font-semibold">{totalResults}</span> {dict.browse.resultsSuffix}
               {q && (
@@ -200,6 +210,7 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
         )}
 
         <InfiniteScrollGrid initialTitles={titles} q={q} tab={tab} genre={genre} year={year} sort={sort} />
+        <ScrollToTop />
       </div>
     </div>
   );

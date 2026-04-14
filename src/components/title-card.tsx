@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Star, Calendar, Play, Tv, Film } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import type { TitleData } from "@/lib/types";
 import { useDictionary } from "./dictionary-provider";
 import { NEON_BLUR_BASE64 } from "@/lib/image-utils";
@@ -17,6 +18,7 @@ interface TitleCardProps {
 
 export function TitleCard({ title, index = 0 }: TitleCardProps) {
   const dict = useDictionary();
+  const router = useRouter();
   const typeIcon = title.type === "anime" ? Tv : Film;
   const TypeIcon = typeIcon;
   const genres = title.genres.split(",").slice(0, 2);
@@ -29,7 +31,11 @@ export function TitleCard({ title, index = 0 }: TitleCardProps) {
       whileHover={{ y: -8, transition: { duration: 0.3 } }}
       className="group h-full"
     >
-      <Link href={`/title/${title.id}`} className="block h-full">
+      <Link 
+        href={`/title/${title.id}`} 
+        className="block h-full"
+        onMouseEnter={() => router.prefetch(`/title/${title.id}`)}
+      >
         <div className="h-full flex flex-col relative rounded-2xl bg-dark-card border border-dark-border hover:border-neon-cyan/30 shadow-[0_4px_20px_rgba(0,0,0,0.5)] hover:shadow-[0_0_20px_rgba(0,240,255,0.4)] transition-all duration-500 card-shine">
           {/* Poster */}
           <div className="relative aspect-[2/3] overflow-hidden rounded-t-[15px]">

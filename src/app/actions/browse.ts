@@ -47,7 +47,10 @@ export async function loadMoreTitles(params: {
           if (ids.length > 0) genreIds = ids.join(",");
         }
         
-        const sortMal = sort === "rating_desc" ? "score" : "members";
+        let sortMal = "members";
+        if (sort === "rating_desc") sortMal = "score";
+        if (sort === "date_asc") sortMal = "start_date";
+        if (sort === "date_desc") sortMal = "start_date";
         
         const res = await getPopularAnime({
             page,
@@ -70,6 +73,7 @@ export async function loadMoreTitles(params: {
         const sortConfig = 
           sort === "rating_desc" ? "vote_average.desc" : 
           sort === "date_desc" ? (fetchType === "tv" ? "first_air_date.desc" : "primary_release_date.desc") : 
+          sort === "date_asc" ? (fetchType === "tv" ? "first_air_date.asc" : "primary_release_date.asc") :
           "popularity.desc";
 
         const res = await getPopularTitles(fetchType, {
@@ -77,7 +81,7 @@ export async function loadMoreTitles(params: {
             page,
             genreId: genreConfig?.type === "genre" ? genreConfig.id : undefined,
             keywordId: genreConfig?.type === "keyword" ? genreConfig.id : undefined,
-            sortBy: sortConfig as "popularity.desc" | "vote_average.desc" | "primary_release_date.desc" | "first_air_date.desc"
+            sortBy: sortConfig as "popularity.desc" | "vote_average.desc" | "primary_release_date.desc" | "first_air_date.desc" | "primary_release_date.asc" | "first_air_date.asc"
         });
         titles = res.results;
     }
