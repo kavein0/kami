@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { User, Calendar, BarChart3, Star, TrendingUp, Clock, Eye, Play, Pause, XCircle } from "lucide-react";
 import Image from "next/image";
 import { useTransition } from "react";
-import { toggleFollow } from "@/app/actions";
+import { toggleFollow } from "@/app/actions/social";
 import { useDictionary } from "./dictionary-provider";
 import { PieChart, Pie, Cell, Tooltip as RechartsTooltip, ResponsiveContainer } from "recharts";
 

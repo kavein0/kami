@@ -11,7 +11,7 @@ import {
   ChevronDown as ChevronDownIcon, 
   Check as CheckIcon 
 } from "lucide-react";
-import { addToList } from "@/app/actions";
+import { addToList } from "@/app/actions/list";
 import type { ListStatus } from "@/lib/types";
 import { useDictionary } from "./dictionary-provider";
 

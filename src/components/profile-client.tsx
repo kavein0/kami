@@ -21,7 +21,8 @@ import {
 import { useState, useTransition, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { updateProfile, searchUsers } from "@/app/actions";
+import { updateProfile } from "@/app/actions/preferences";
+import { searchUsers } from "@/app/actions/social";
 import type { UserStats } from "@/lib/types";
 import { UploadButton } from "@/utils/uploadthing";
 import { PieChart, Pie, Cell, Tooltip as RechartsTooltip, ResponsiveContainer } from "recharts";

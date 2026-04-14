@@ -15,7 +15,8 @@ import {
   Loader2,
 } from "lucide-react";
 import { useState, useEffect, useTransition } from "react";
-import { logoutAction, setLanguage } from "@/app/actions";
+import { logoutAction } from "@/app/actions/auth";
+import { setLanguage } from "@/app/actions/preferences";
 import { GlobalSearch } from "./global-search";
 
 interface NavUser {

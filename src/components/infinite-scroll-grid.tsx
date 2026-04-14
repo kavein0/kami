@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { TitleCard } from "./title-card";
 import { TitleData } from "@/lib/types";
-import { loadMoreTitles } from "@/app/actions";
+import { loadMoreTitles } from "@/app/actions/browse";
 import { useDictionary } from "./dictionary-provider";
 
 const PAGE_SIZE = 24;

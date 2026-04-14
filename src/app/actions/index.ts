@@ -1,3 +1,5 @@
+"use server";
+
 // Barrel re-export — all domain actions from a single import path
 export { registerAction, loginAction, logoutAction } from "./auth";
 export { addToList, removeFromList, updateListEntry, submitReview } from "./list";

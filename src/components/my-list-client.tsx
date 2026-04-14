@@ -5,7 +5,7 @@ import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { DragDropContext, Droppable, Draggable, DropResult } from "@hello-pangea/dnd";
 import { ListEntryData } from "@/lib/types";
-import { updateListEntry, removeFromList } from "@/app/actions";
+import { updateListEntry, removeFromList } from "@/app/actions/list";
 import { Star, MessageSquare, Trash2, Edit3, X, Save } from "lucide-react";
 
 interface Props {

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Mail, Lock, LogIn, Sparkles, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
-import { loginAction } from "@/app/actions";
+import { loginAction } from "@/app/actions/auth";
 import { useRouter } from "next/navigation";
 
 interface Props {

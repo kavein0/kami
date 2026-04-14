@@ -18,7 +18,7 @@ import {
 import Link from "next/link";
 import Image from "next/image";
 import { StatusButtons } from "@/components/status-buttons";
-import { submitReview } from "@/app/actions";
+import { submitReview } from "@/app/actions/list";
 import { TitleCard } from "@/components/title-card";
 import type { TitleData } from "@/lib/types";
 import { NEON_BLUR_BASE64 } from "@/lib/image-utils";
