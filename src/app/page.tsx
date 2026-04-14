@@ -28,13 +28,13 @@ export default async function HomePage() {
     { results: heroPoolSeries }
   ] = await Promise.all([
     getActivityFeedTitles(session?.user?.id),
-    getPopularAnime({ sortBy: "members", page: 1 }),
-    getPopularTitles("movie", { sortBy: "popularity.desc", page: 1 }),
-    getPopularTitles("tv", { sortBy: "popularity.desc", filterAnime: false, page: 1 }),
+    getPopularAnime({ sortBy: "score", page: 1 }),
+    getPopularTitles("movie", { sortBy: "vote_average.desc", page: 1 }),
+    getPopularTitles("tv", { sortBy: "vote_average.desc", filterAnime: false, page: 1 }),
     getDictionary(),
     getPopularAnime({ sortBy: "score", page: heroPage }),
-    getPopularTitles("movie", { sortBy: "popularity.desc", page: heroPage }),
-    getPopularTitles("tv", { sortBy: "popularity.desc", filterAnime: false, page: heroPage })
+    getPopularTitles("movie", { sortBy: "vote_average.desc", page: heroPage }),
+    getPopularTitles("tv", { sortBy: "vote_average.desc", filterAnime: false, page: heroPage })
   ]);
 
   // Combine top-rated anime, movies, and series of the randomized page for the daily hero pool
