@@ -66,10 +66,10 @@ export const STATUS_COLORS: Record<ListStatus, string> = {
 };
 
 export type GenreConfig = {
-  id: number;
+  id: number | string;
   name: string;
   type: "genre" | "keyword";
-  description: string;
+  description?: string;
 };
 
 export const ANIME_GENRES: GenreConfig[] = [

@@ -335,7 +335,7 @@ export async function loadMoreTitles(params: {
         
         const res = await getPopularAnime({
             page,
-            genreId: genreIds as any,
+            genreId: genreIds,
             sortBy: sortMal,
         });
         titles = res.results;
@@ -359,8 +359,8 @@ export async function loadMoreTitles(params: {
         const res = await getPopularTitles(fetchType, {
             filterAnime: false,
             page,
-            genreId: genreConfig?.type === "genre" ? (genreConfig.id as any) : undefined,
-            keywordId: genreConfig?.type === "keyword" ? (genreConfig.id as any) : undefined,
+            genreId: genreConfig?.type === "genre" ? genreConfig.id : undefined,
+            keywordId: genreConfig?.type === "keyword" ? genreConfig.id : undefined,
             sortBy: sortConfig as any
         });
         titles = res.results;

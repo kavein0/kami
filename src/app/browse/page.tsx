@@ -63,7 +63,7 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
         
         const res = await getPopularAnime({
             page: 1,
-            genreId: genreIds as any,
+            genreId: genreIds,
             sortBy: sortMal,
         });
         titles = res.results;

@@ -274,7 +274,7 @@ export async function searchAnime(query: string, page = 1): Promise<{ results: T
 export async function getPopularAnime(
   options: {
     page?: number;
-    genreId?: number;
+    genreId?: number | string;
     sortBy?: "score" | "members" | "favorites";
   } = {}
 ): Promise<{ results: TitleData[], totalResults: number }> {
