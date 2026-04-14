@@ -62,7 +62,7 @@ export default async function HomePage() {
         <TitleSection
           title={dict.feed.title || "For You"}
           icon={<Sparkles className="w-6 h-6 text-neon-cyan animate-pulse-neon" />}
-          titles={activityTitles.slice(0, 8)}
+          titles={activityTitles.slice(0, 12)}
           href="/feed"
         />
         <TitleSection

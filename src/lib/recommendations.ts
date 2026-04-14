@@ -1,6 +1,8 @@
 import { prisma } from "./prisma";
 import { getPopularAnime } from "./jikan";
 
+const ACTIVITY_FEED_LIMIT = 12;
+
 export async function getPersonalizedRecommendations(userId?: string) {
   if (!userId) {
     // If not logged in, show trending anime
@@ -98,13 +100,15 @@ export async function getActivityFeedTitles(userId?: string) {
     if (!uniqueByTitleId.has(item.title.id)) {
       uniqueByTitleId.set(item.title.id, item.title);
     }
-    if (uniqueByTitleId.size >= 8) break;
+    if (uniqueByTitleId.size >= ACTIVITY_FEED_LIMIT) break;
   }
 
   const titles = Array.from(uniqueByTitleId.values());
-  if (titles.length >= 8) return titles;
+  if (titles.length >= ACTIVITY_FEED_LIMIT) return titles;
 
   const { results } = await getPopularAnime({ sortBy: "score", page: 1 });
-  const padding = results.filter((r) => !uniqueByTitleId.has(r.id)).slice(0, 8 - titles.length);
+  const padding = results
+    .filter((r) => !uniqueByTitleId.has(r.id))
+    .slice(0, ACTIVITY_FEED_LIMIT - titles.length);
   return [...titles, ...padding];
 }
