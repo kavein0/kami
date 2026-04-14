@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { TitleCard } from "./title-card";
 import { TitleListItem } from "./title-list-item";
-import { SkeletonCard } from "./skeleton-card";
+import { SkeletonCard, SkeletonListItem } from "./skeleton-card";
 import { TitleData } from "@/lib/types";
 import { loadMoreTitles } from "@/app/actions/browse";
 import { useDictionary } from "./dictionary-provider";
@@ -145,7 +145,7 @@ export function InfiniteScrollGrid({ initialTitles, q, tab, genre, year, sort }:
             <TitleListItem key={`${title.id}-${i}`} title={title} index={i} />
           ))}
           {isLoading && [...Array(6)].map((_, i) => (
-            <div key={`skel-list-${i}`} className="h-44 w-full bg-dark-card/50 rounded-2xl animate-pulse" />
+            <SkeletonListItem key={`skel-list-${i}`} />
           ))}
         </div>
       )}

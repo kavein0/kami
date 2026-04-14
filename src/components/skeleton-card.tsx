@@ -42,3 +42,33 @@ export function SkeletonGrid() {
     </div>
   );
 }
+
+export function SkeletonListItem() {
+  return (
+    <div className="flex gap-4 p-3 rounded-2xl bg-dark-card/50 border border-dark-border/50 shadow-lg animate-pulse overflow-hidden">
+      {/* Poster Skeleton */}
+      <div className="relative w-24 sm:w-32 aspect-[2/3] shrink-0 bg-dark-surface/50 rounded-xl" />
+      
+      {/* Content Skeleton */}
+      <div className="flex-1 flex flex-col py-1 space-y-3">
+        <div className="h-5 w-1/2 bg-dark-surface rounded-md" />
+        <div className="h-3 w-1/4 bg-dark-surface/60 rounded-md" />
+        
+        <div className="flex gap-4 items-center">
+          <div className="h-4 w-12 bg-dark-surface/40 rounded-full" />
+          <div className="h-4 w-12 bg-dark-surface/40 rounded-full" />
+        </div>
+        
+        <div className="flex-1 space-y-2 pt-2">
+          <div className="h-3 w-full bg-dark-surface/20 rounded-md" />
+          <div className="h-3 w-5/6 bg-dark-surface/20 rounded-md" />
+        </div>
+        
+        <div className="flex gap-2 pt-2">
+          <div className="h-6 w-16 bg-neon-cyan/5 rounded-md border border-neon-cyan/10" />
+          <div className="h-6 w-16 bg-dark-surface/40 rounded-md" />
+        </div>
+      </div>
+    </div>
+  );
+}
