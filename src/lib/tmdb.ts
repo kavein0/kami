@@ -138,7 +138,7 @@ export async function getPopularTitles(
     page?: number;
     genreId?: number | string;
     keywordId?: number | string;
-    sortBy?: "popularity.desc" | "vote_average.desc" | "primary_release_date.desc" | "first_air_date.desc";
+    sortBy?: "popularity.desc" | "vote_average.desc" | "primary_release_date.desc" | "first_air_date.desc" | "primary_release_date.asc" | "first_air_date.asc";
   } = {}
 ): Promise<{ results: TitleData[], totalResults: number }> {
   const { filterAnime = false, page = 1, genreId, keywordId, sortBy = "popularity.desc" } = options;

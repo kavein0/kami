@@ -283,7 +283,7 @@ export async function getPopularAnime(
 
   const params: Record<string, string> = {
     page: page.toString(),
-    limit: "24", // Fill the 6-column grid perfectly
+    limit: "20", // Matches PAGE_SIZE for consistent pagination
     order_by: sortBy === "start_date" ? "start_date" : sortBy,
     sort: sort,
   };

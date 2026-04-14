@@ -9,7 +9,7 @@ import { loadMoreTitles } from "@/app/actions/browse";
 import { useDictionary } from "./dictionary-provider";
 import { ViewModeToggle } from "./view-mode-toggle";
 
-const PAGE_SIZE = 24;
+const PAGE_SIZE = 20;
 
 interface Props {
   initialTitles: TitleData[];
@@ -47,6 +47,7 @@ export function InfiniteScrollGrid({ initialTitles, q, tab, genre, year, sort }:
     setTitles(initialTitles);
     pageRef.current = 1;
     setHasMore(initialTitles.length >= PAGE_SIZE);
+    isFetchingRef.current = false; // Reset fetching flag to allow new loads
   }, [initialTitles, q, tab, genre, year, sort]);
 
   const fetchMore = useCallback(async () => {
