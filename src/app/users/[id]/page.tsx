@@ -20,15 +20,9 @@ export default async function PublicProfilePage({ params }: Props) {
         { name: decodedId }
       ]
     },
-    select: {
-      id: true,
-      name: true,
-      bio: true,
-      image: true,
-      createdAt: true,
-      _count: {
-        select: { followers: true, following: true }
-      }
+    include: {
+      followers: { include: { follower: { select: { id: true, name: true, image: true } } } },
+      following: { include: { following: { select: { id: true, name: true, image: true } } } },
     }
   });
 
@@ -104,7 +98,13 @@ export default async function PublicProfilePage({ params }: Props) {
 
   return (
     <PublicProfileClient
-      user={user}
+      user={{
+        id: user.id,
+        name: user.name,
+        bio: user.bio,
+        image: user.image,
+        createdAt: user.createdAt.toISOString(),
+      }}
       stats={{
         totalWatched: statsMap["watched"] || 0,
         totalWatching: statsMap["watching"] || 0,
@@ -116,6 +116,8 @@ export default async function PublicProfilePage({ params }: Props) {
       }}
       topGenres={topGenres}
       timeSpent={timeSpentString}
+      followers={user.followers.map(f => f.follower)}
+      following={user.following.map(f => f.following)}
       isFollowing={isFollowing}
       isSelf={isSelf}
     />
