@@ -18,6 +18,7 @@ import { useState, useEffect, useTransition } from "react";
 import { logoutAction } from "@/app/actions/auth";
 import { setLanguage } from "@/app/actions/preferences";
 import { GlobalSearch } from "./global-search";
+import { getRandomTitleAction } from "@/app/actions/titles";
 
 interface NavUser {
   name: string | null;
@@ -35,6 +36,15 @@ export function Navbar({ lang, dict, user }: NavbarProps) {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [isPendingLang, startTransitionLang] = useTransition();
+  const [isPendingRandom, startTransitionRandom] = useTransition();
+
+  const handleRandomClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    startTransitionRandom(async () => {
+      await getRandomTitleAction();
+    });
+  };
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -62,17 +72,38 @@ export function Navbar({ lang, dict, user }: NavbarProps) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 group">
-            <motion.div
-              whileHover={{ rotate: 180 }}
-              transition={{ duration: 0.5 }}
+          <div className="flex items-center gap-2 group">
+            <motion.button
+              onClick={handleRandomClick}
+              disabled={isPendingRandom}
+              whileHover={{ rotate: 180, scale: 1.2 }}
+              whileTap={{ scale: 0.9 }}
+              animate={isPendingRandom ? { 
+                rotate: 360,
+                scale: [1, 1.2, 1],
+                filter: ["blur(0px)", "blur(2px)", "blur(0px)"]
+              } : {}}
+              transition={isPendingRandom ? { 
+                repeat: Infinity, 
+                duration: 1, 
+                ease: "linear" 
+              } : { duration: 0.5 }}
+              className="relative cursor-pointer focus:outline-none"
+              title="Surprise me! / Случайный выбор"
             >
-              <Sparkles className="w-7 h-7 text-neon-cyan" />
-            </motion.div>
-            <span className="text-xl font-bold bg-gradient-to-r from-neon-cyan to-neon-pink bg-clip-text text-transparent">
+              <Sparkles className={`w-7 h-7 transition-colors ${isPendingRandom ? 'text-neon-pink' : 'text-neon-cyan'}`} />
+              {isPendingRandom && (
+                <motion.div 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="absolute inset-0 rounded-full bg-neon-cyan/20 blur-md"
+                />
+              )}
+            </motion.button>
+            <Link href="/" className="text-xl font-bold bg-gradient-to-r from-neon-cyan to-neon-pink bg-clip-text text-transparent hover:opacity-80 transition-opacity">
               MiruVerse
-            </span>
-          </Link>
+            </Link>
+          </div>
 
           {/* Desktop Nav */}
           <nav className="hidden md:flex items-center gap-1">
