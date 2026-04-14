@@ -325,9 +325,13 @@ export function MyListClient({ entries: initialEntries, dict }: Props) {
                   
                   <div className="flex items-center gap-4 pr-2">
                     <div className="flex items-center gap-2">
-                      <button onClick={() => handleUpdateProgress(entry.id, (entry.progress||0) - 1)} className="p-1 hover:text-white text-dark-muted"><Minus className="w-3.5 h-3.5" /></button>
-                      <span className="text-xs font-mono w-10 text-center">{entry.progress || 0} / {entry.title.episodes || "?"}</span>
-                      <button onClick={() => handleUpdateProgress(entry.id, (entry.progress||0) + 1)} className="p-1 hover:text-white text-dark-muted"><Plus className="w-3.5 h-3.5" /></button>
+                      {entry.title.type !== 'movie' && (
+                        <>
+                          <button onClick={() => handleUpdateProgress(entry.id, (entry.progress||0) - 1)} className="p-1 hover:text-white text-dark-muted"><Minus className="w-3.5 h-3.5" /></button>
+                          <span className="text-xs font-mono w-10 text-center">{entry.progress || 0} / {entry.title.episodes || "?"}</span>
+                          <button onClick={() => handleUpdateProgress(entry.id, (entry.progress||0) + 1)} className="p-1 hover:text-white text-dark-muted"><Plus className="w-3.5 h-3.5" /></button>
+                        </>
+                      )}
                     </div>
                     <div className="flex items-center gap-1 text-neon-yellow w-12 justify-end shrink-0">
                       <Star className="w-3.5 h-3.5 fill-current" />
@@ -445,23 +449,25 @@ function EntryCardContent({
           
           <div className="flex flex-col gap-2 mt-2">
             {/* Progress Bar */}
-            <div className="flex items-center justify-between bg-black/40 rounded-lg p-1 border border-dark-border/50">
-              <button onClick={() => onProgressUpdate((entry.progress || 0) - 1)} className="p-1 hover:text-neon-pink disabled:opacity-30 disabled:hover:text-inherit text-dark-muted transition-colors rounded" disabled={(entry.progress||0) <= 0}>
-                <Minus className="w-3.5 h-3.5" />
-              </button>
-              <div className="flex-1 text-center flex flex-col items-center leading-none">
-                <span className="text-xs font-mono font-bold tracking-wide text-white">
-                  {entry.progress || 0} <span className="text-dark-muted text-[10px]">/ {entry.title.episodes || "?"}</span>
-                </span>
+            {entry.title.type !== 'movie' && (
+              <div className="flex items-center justify-between bg-black/40 rounded-lg p-1 border border-dark-border/50">
+                <button onClick={() => onProgressUpdate((entry.progress || 0) - 1)} className="p-1 hover:text-neon-pink disabled:opacity-30 disabled:hover:text-inherit text-dark-muted transition-colors rounded" disabled={(entry.progress||0) <= 0}>
+                  <Minus className="w-3.5 h-3.5" />
+                </button>
+                <div className="flex-1 text-center flex flex-col items-center leading-none">
+                  <span className="text-xs font-mono font-bold tracking-wide text-white">
+                    {entry.progress || 0} <span className="text-dark-muted text-[10px]">/ {entry.title.episodes || "?"}</span>
+                  </span>
+                </div>
+                <button 
+                  onClick={() => onProgressUpdate((entry.progress || 0) + 1)} 
+                  className="p-1 hover:text-neon-green disabled:opacity-30 disabled:hover:text-inherit text-dark-muted transition-colors rounded"
+                  disabled={entry.title.episodes ? (entry.progress||0) >= entry.title.episodes : false}
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                </button>
               </div>
-              <button 
-                onClick={() => onProgressUpdate((entry.progress || 0) + 1)} 
-                className="p-1 hover:text-neon-green disabled:opacity-30 disabled:hover:text-inherit text-dark-muted transition-colors rounded"
-                disabled={entry.title.episodes ? (entry.progress||0) >= entry.title.episodes : false}
-              >
-                <Plus className="w-3.5 h-3.5" />
-              </button>
-            </div>
+            )}
 
             {/* Bottom Actions */}
             <div className="flex flex-wrap items-center justify-between gap-1">
