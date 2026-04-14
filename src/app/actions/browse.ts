@@ -52,10 +52,13 @@ export async function loadMoreTitles(params: {
         if (sort === "date_asc") sortMal = "start_date";
         if (sort === "date_desc") sortMal = "start_date";
         
+        const sortDir = sort === "date_asc" ? "asc" : "desc";
+        
         const res = await getPopularAnime({
             page,
             genreId: genreIds,
-            sortBy: sortMal,
+            sortBy: sortMal as any,
+            sort: sortDir
         });
         titles = res.results;
     } else {

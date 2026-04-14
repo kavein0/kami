@@ -275,21 +275,22 @@ export async function getPopularAnime(
   options: {
     page?: number;
     genreId?: number | string;
-    sortBy?: "score" | "members" | "favorites";
+    sortBy?: "score" | "members" | "favorites" | "start_date";
+    sort?: "asc" | "desc";
   } = {}
 ): Promise<{ results: TitleData[], totalResults: number }> {
-  const { page = 1, genreId, sortBy = "members" } = options;
+  const { page = 1, genreId, sortBy = "members", sort = "desc" } = options;
 
   const params: Record<string, string> = {
     page: page.toString(),
     limit: "24", // Fill the 6-column grid perfectly
+    order_by: sortBy === "start_date" ? "start_date" : sortBy,
+    sort: sort,
   };
   
   if (genreId) {
     // If we have a genre filter, we must use /anime endpoint instead of /top/anime
     params["genres"] = genreId.toString();
-    params["order_by"] = sortBy === "members" ? "members" : "score";
-    params["sort"] = "desc";
     
     const data = await fetchJikan("/anime", params);
     let results = (data.data || []).map((item: any) => normalizeJikanTitle(item));
@@ -300,14 +301,9 @@ export async function getPopularAnime(
       totalResults: data.pagination?.items?.total || 0
     };
   } else {
-    // Default Top Anime
+    // Default Top Anime or Sorted List
     const endpoint = sortBy === "score" ? "/top/anime" : "/anime";
     
-    if (sortBy === "members") {
-        params["order_by"] = "members";
-        params["sort"] = "desc";
-    }
-
     const data = await fetchJikan(endpoint, params);
     let results = (data.data || []).map((item: any) => normalizeJikanTitle(item));
     results = await enrichWithRussian(results);

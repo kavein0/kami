@@ -134,7 +134,9 @@ export function InfiniteScrollGrid({ initialTitles, q, tab, genre, year, sort }:
           {titles.map((title, i) => (
             <TitleCard key={`${title.id}-${i}`} title={title} index={i} />
           ))}
-          {isLoading && <SkeletonGrid />}
+          {isLoading && [...Array(12)].map((_, i) => (
+            <SkeletonCard key={`skel-${i}`} />
+          ))}
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -142,7 +144,7 @@ export function InfiniteScrollGrid({ initialTitles, q, tab, genre, year, sort }:
             <TitleListItem key={`${title.id}-${i}`} title={title} index={i} />
           ))}
           {isLoading && [...Array(6)].map((_, i) => (
-            <div key={i} className="h-44 w-full bg-dark-card/50 rounded-2xl animate-pulse" />
+            <div key={`skel-list-${i}`} className="h-44 w-full bg-dark-card/50 rounded-2xl animate-pulse" />
           ))}
         </div>
       )}
