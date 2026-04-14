@@ -23,18 +23,26 @@ export default async function HomePage() {
     { results: topMovies },
     { results: topSeries },
     dict,
-    { results: heroPoolAnime }
+    { results: heroPoolAnime },
+    { results: heroPoolMovies },
+    { results: heroPoolSeries }
   ] = await Promise.all([
     getActivityFeedTitles(session?.user?.id),
     getPopularAnime({ sortBy: "members", page: 1 }),
-    getPopularTitles("movie", { sortBy: "popularity.desc", page: heroPage }),
-    getPopularTitles("tv", { sortBy: "popularity.desc", filterAnime: false, page: heroPage }),
+    getPopularTitles("movie", { sortBy: "popularity.desc", page: 1 }),
+    getPopularTitles("tv", { sortBy: "popularity.desc", filterAnime: false, page: 1 }),
     getDictionary(),
-    getPopularAnime({ sortBy: "score", page: heroPage })
+    getPopularAnime({ sortBy: "score", page: heroPage }),
+    getPopularTitles("movie", { sortBy: "popularity.desc", page: heroPage }),
+    getPopularTitles("tv", { sortBy: "popularity.desc", filterAnime: false, page: heroPage })
   ]);
 
-  // Combine top-rated anime, movies, and series of the current page for the daily hero pool
-  const mixedHeroPool = [...heroPoolAnime.slice(0, 5), ...topMovies.slice(0, 5), ...topSeries.slice(0, 5)];
+  // Combine top-rated anime, movies, and series of the randomized page for the daily hero pool
+  const mixedHeroPool = [
+    ...heroPoolAnime.slice(0, 5), 
+    ...heroPoolMovies.slice(0, 5), 
+    ...heroPoolSeries.slice(0, 5)
+  ];
 
   // Pick an index within that page based on the day
   const heroIndex = daysSinceEpoch % Math.max(mixedHeroPool.length, 1);
