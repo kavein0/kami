@@ -37,7 +37,7 @@ const globalForPrisma = globalThis as unknown as {
 function createPrismaClient() {
   const pool = new Pool({
     connectionString: dbUrl,
-    ssl: { rejectUnauthorized: process.env.NODE_ENV === "production" },
+    ssl: { rejectUnauthorized: false },
     max: 1, // Required for Vercel Serverless
     allowExitOnIdle: true, // Prevents event loop hangs when freezing
     connectionTimeoutMillis: 5000,
