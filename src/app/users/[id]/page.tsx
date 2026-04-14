@@ -100,7 +100,7 @@ export default async function PublicProfilePage({ params }: Props) {
     <PublicProfileClient
       user={{
         id: user.id,
-        name: user.name,
+        name: user.name || "",
         bio: user.bio,
         image: user.image,
         createdAt: user.createdAt.toISOString(),
