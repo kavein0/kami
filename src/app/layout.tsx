@@ -21,6 +21,10 @@ export async function generateMetadata(): Promise<Metadata> {
     title: `MiruVerse — ${dict.home.footerNote.split(' ').slice(0, 3).join(' ')}`,
     description: dict.browse.subtitle,
     keywords: ["anime", "movies", "tracker", "list", "MiruVerse"],
+    icons: {
+      icon: "/icon.png",
+      apple: "/icon.png",
+    },
     openGraph: {
       title: "MiruVerse",
       description: dict.browse.subtitle,

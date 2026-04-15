@@ -3,7 +3,7 @@ import { getPopularAnime, fetchKitsuCover, enrichDetailWithRussian } from "@/lib
 import { HeroBanner } from "@/components/hero-banner";
 import { TitleSection } from "@/components/title-section";
 import { Flame, TrendingUp, Clapperboard, Sparkles } from "lucide-react";
-import { getDictionary } from "@/lib/i18n";
+import { getDictionary, getLanguage } from "@/lib/i18n";
 import { ANIME_GENRES } from "@/lib/types";
 import { ClientPageTransition } from "@/components/client-page-transition";
 import { auth } from "@/lib/auth";
@@ -11,6 +11,7 @@ import { getActivityFeedTitles } from "@/lib/recommendations";
 
 export default async function HomePage() {
   const session = await auth();
+  const lang = await getLanguage();
 
   const utcNow = new Date();
   const daysSinceEpoch = Math.floor(utcNow.getTime() / (1000 * 60 * 60 * 24));
@@ -33,8 +34,8 @@ export default async function HomePage() {
     getPopularTitles("tv", { sortBy: "vote_average.desc", filterAnime: false, page: 1 }),
     getDictionary(),
     getPopularAnime({ sortBy: "score", page: heroPage }),
-    getPopularTitles("movie", { sortBy: "vote_average.desc", page: heroPage }),
-    getPopularTitles("tv", { sortBy: "vote_average.desc", filterAnime: false, page: heroPage })
+    getPopularTitles("movie", { sortBy: "vote_average.desc", page: heroPage, language: "en" }),
+    getPopularTitles("tv", { sortBy: "vote_average.desc", filterAnime: false, page: heroPage, language: "en" })
   ]);
 
   // Combine top-rated anime, movies, and series of the randomized page for the daily hero pool
@@ -58,6 +59,15 @@ export default async function HomePage() {
     heroTitle = enrichedHeroTitle;
     if (kitsuCover) {
       heroTitle = { ...heroTitle, backdrop: kitsuCover };
+    }
+  } else if (heroTitle && (heroTitle.type === "movie" || heroTitle.type === "series")) {
+    // If it's a movie/series and we're in RU mode, fetch localized details for the specific ID
+    if (lang === "ru") {
+      const { getTitleDetail } = await import("@/lib/tmdb");
+      const localizedTitle = await getTitleDetail(heroTitle.id);
+      if (localizedTitle) {
+        heroTitle = localizedTitle;
+      }
     }
   }
 

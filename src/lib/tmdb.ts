@@ -84,13 +84,13 @@ function normalizeTMDBTitle(item: any, type: "movie" | "tv"): TitleData {
   };
 }
 
-export async function fetchTMDB(endpoint: string, params: Record<string, string> = {}) {
+export async function fetchTMDB(endpoint: string, params: Record<string, string> = {}, language?: string) {
   if (!TMDB_API_KEY) {
     throw new TMDBError("TMDB_API_KEY is not set in environment variables");
   }
 
-  const langCode = await getLanguage();
-  const formatLang = langCode === "en" ? "en-US" : "ru-RU";
+  const langCode = language || await getLanguage();
+  const formatLang = langCode === "en" ? "en-US" : langCode === "ru" ? "ru-RU" : langCode;
 
   const url = new URL(`${TMDB_BASE_URL}${endpoint}`);
   url.searchParams.append("api_key", TMDB_API_KEY);
@@ -138,10 +138,11 @@ export async function getPopularTitles(
     page?: number;
     genreId?: number | string;
     keywordId?: number | string;
+    language?: string;
     sortBy?: "popularity.desc" | "vote_average.desc" | "primary_release_date.desc" | "first_air_date.desc" | "primary_release_date.asc" | "first_air_date.asc";
   } = {}
 ): Promise<{ results: TitleData[], totalResults: number }> {
-  const { filterAnime = false, page = 1, genreId, keywordId, sortBy = "popularity.desc" } = options;
+  const { filterAnime = false, page = 1, genreId, keywordId, language, sortBy = "popularity.desc" } = options;
 
   if (!TMDB_API_KEY) {
     const localRes = await prisma.title.findMany({
@@ -184,7 +185,7 @@ export async function getPopularTitles(
   const data = await fetchTMDB(`/discover/${type}`, {
     sort_by: sortBy,
     ...params
-  });
+  }, language);
 
   return {
     results: data.results.map((item: any) => normalizeTMDBTitle(item, type)),
