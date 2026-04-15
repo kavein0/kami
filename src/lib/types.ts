@@ -53,6 +53,7 @@ export interface UserSmall {
   id: string;
   name: string | null;
   image: string | null;
+  bannerImage?: string | null;
 }
 
 export const STATUS_LABELS: Record<ListStatus, string> = {

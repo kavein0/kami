@@ -96,6 +96,19 @@ export default async function PublicProfilePage({ params }: Props) {
     ? `${daysSpent} д. ${hoursSpent} ч.` 
     : `${hoursSpent} ч.`;
 
+  // Get a fallback banner from user's most recent highly rated titles
+  const recentHighRated = await prisma.listEntry.findFirst({
+    where: { 
+      userId: user.id, 
+      status: { in: ["watched", "watching"] },
+      title: { backdrop: { not: null } }
+    },
+    orderBy: { score: "desc" },
+    include: { title: true }
+  });
+
+  const fallbackBanner = recentHighRated?.title.backdrop || null;
+
   return (
     <PublicProfileClient
       user={{
@@ -103,6 +116,7 @@ export default async function PublicProfilePage({ params }: Props) {
         name: user.name || "",
         bio: user.bio,
         image: user.image,
+        bannerImage: user.bannerImage || fallbackBanner,
         createdAt: user.createdAt.toISOString(),
       }}
       stats={{
