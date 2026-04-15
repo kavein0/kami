@@ -1,9 +1,11 @@
 "use server";
 
 import { searchTitles, getPopularTitles } from "@/lib/tmdb";
-import { ANIME_GENRES, MOVIE_GENRES, SERIES_GENRES } from "@/lib/types";
+import { ANIME_GENRES, MOVIE_GENRES, SERIES_GENRES, TitleData } from "@/lib/types";
 import { getPopularAnime, searchAnime } from "@/lib/jikan";
 import { z } from "zod";
+
+type AnimeSortBy = NonNullable<Parameters<typeof getPopularAnime>[0]>["sortBy"];
 
 const loadMoreSchema = z.object({
   page: z.number().int().min(1),
@@ -26,7 +28,7 @@ export async function loadMoreTitles(params: {
   if (!parsed.success) return [];
 
   const { page, q, tab, genre, year, sort } = parsed.data;
-  let titles = [];
+  let titles: TitleData[] = [];
 
   if (q) {
     if (tab === "anime") {
@@ -47,7 +49,7 @@ export async function loadMoreTitles(params: {
           if (ids.length > 0) genreIds = ids.join(",");
         }
         
-        let sortMal = "members";
+        let sortMal: AnimeSortBy = "members";
         if (sort === "rating_desc") sortMal = "score";
         if (sort === "date_asc") sortMal = "start_date";
         if (sort === "date_desc") sortMal = "start_date";
@@ -57,7 +59,7 @@ export async function loadMoreTitles(params: {
         const res = await getPopularAnime({
             page,
             genreId: genreIds,
-            sortBy: sortMal as any,
+            sortBy: sortMal,
             sort: sortDir
         });
         titles = res.results;

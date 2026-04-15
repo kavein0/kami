@@ -1,15 +1,16 @@
 "use client";
 
 import React, { createContext, useContext } from "react";
+import type { Dictionary } from "@/lib/i18n";
 
-const DictionaryContext = createContext<any>(null);
+const DictionaryContext = createContext<Dictionary | null>(null);
 
 export function DictionaryProvider({
   children,
   dict,
 }: {
   children: React.ReactNode;
-  dict: any;
+  dict: Dictionary;
 }) {
   return (
     <DictionaryContext.Provider value={dict}>

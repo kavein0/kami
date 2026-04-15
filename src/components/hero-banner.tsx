@@ -4,7 +4,7 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { Star, Play, Sparkles } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import { useRef, useEffect, useState } from "react";
+import { useRef } from "react";
 import type { TitleData } from "@/lib/types";
 import { useDictionary } from "./dictionary-provider";
 import { NEON_BLUR_BASE64 } from "@/lib/image-utils";
@@ -13,14 +13,22 @@ interface HeroBannerProps {
   title: TitleData;
 }
 
+type HeroParticle = {
+  left: string;
+  top: string;
+  duration: number;
+  delay: number;
+};
+
 export function HeroBanner({ title }: HeroBannerProps) {
   const dict = useDictionary();
   const ref = useRef(null);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const particles: HeroParticle[] = Array.from({ length: 5 }, (_, i) => ({
+    left: `${20 + i * 14}%`,
+    top: `${20 + i * 15}%`,
+    duration: 4 + i,
+    delay: i * 0.5,
+  }));
   
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -55,13 +63,13 @@ export function HeroBanner({ title }: HeroBannerProps) {
 
       {/* Animated neon particles */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {mounted && [...Array(5)].map((_, i) => (
+        {particles.map((particle, i) => (
           <motion.div
             key={i}
             className="absolute w-1.5 h-1.5 rounded-full bg-neon-cyan shadow-[0_0_10px_rgba(0,240,255,0.8)]"
             style={{
-              left: `${15 + Math.random() * 70}%`, // Randomized positioning to some degree
-              top: `${20 + i * 15}%`,
+              left: particle.left,
+              top: particle.top,
             }}
             animate={{
               y: [0, -40, 0],
@@ -69,9 +77,9 @@ export function HeroBanner({ title }: HeroBannerProps) {
               scale: [1, 1.5, 1],
             }}
             transition={{
-              duration: 4 + i,
+              duration: particle.duration,
               repeat: Infinity,
-              delay: i * 0.5,
+              delay: particle.delay,
               ease: "easeInOut",
             }}
           />

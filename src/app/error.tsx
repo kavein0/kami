@@ -12,7 +12,6 @@ export default function ErrorPage({
   reset: () => void;
 }) {
   const dict = useDictionary();
-  // eslint-disable-next-line no-console
   console.error("Caught in error boundary:", error);
   return (
     <div className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden">
@@ -32,10 +31,10 @@ export default function ErrorPage({
         </motion.div>
 
         <h1 className="text-2xl font-bold text-white mb-3">
-          {dict.errors?.somethingWrong || "Something went wrong"}
+          {dict.common.error || "Something went wrong"}
         </h1>
         <p className="text-dark-muted mb-8">
-          {dict.errors?.tryAgainDesc || "An error occurred while loading the page. Please try again."}
+          An error occurred while loading the page. Please try again.
         </p>
 
         <button
@@ -43,7 +42,7 @@ export default function ErrorPage({
           className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-gradient-to-r from-neon-pink to-neon-purple text-white font-bold text-sm hover:opacity-90 transition-opacity neon-glow-pink"
         >
           <RotateCcw className="w-5 h-5" />
-          {dict.errors?.tryAgain || "Try Again"}
+          Try Again
         </button>
       </motion.div>
     </div>

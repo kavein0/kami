@@ -61,7 +61,7 @@ export function PublicProfileClient({
     startTransition(async () => {
       try {
         await toggleFollow(user.id);
-      } catch (err) {
+      } catch {
         setIsFollowing(initialIsFollowing); // Rollback
       }
     });
@@ -198,7 +198,7 @@ export function PublicProfileClient({
 
             {/* Breakdown */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-8">
-              {statCards.map((s, i) => (
+              {statCards.map((s) => (
                 <div
                   key={s.label}
                   className={`rounded-2xl bg-gradient-to-br ${s.bg} border border-dark-border p-4 flex items-center gap-4`}

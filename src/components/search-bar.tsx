@@ -16,6 +16,10 @@ export function SearchBar() {
     e?.preventDefault();
     const params = new URLSearchParams();
     if (query) params.set("q", query);
+    const currentTab = searchParams.get("tab");
+    if (currentTab) {
+      params.set("tab", currentTab);
+    }
 
     startTransition(() => {
       router.push(`/browse?${params.toString()}`);

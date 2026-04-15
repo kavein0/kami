@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Home, Search, List, User, Activity } from "lucide-react";
 import { motion } from "framer-motion";
+import type { Dictionary } from "@/lib/i18n";
 
 const tabs = [
   { href: "/", icon: Home, label: "home" },
@@ -11,9 +12,13 @@ const tabs = [
   { href: "/feed", icon: Activity, label: "feed" },
   { href: "/my-list", icon: List, label: "myList" },
   { href: "/profile", icon: User, label: "profile" },
-];
+] as const satisfies ReadonlyArray<{
+  href: string;
+  icon: typeof Home;
+  label: keyof Dictionary["nav"];
+}>;
 
-export function MobileNav({ dict }: { dict: Record<string, any> }) {
+export function MobileNav({ dict }: { dict: Dictionary["nav"] }) {
   const pathname = usePathname();
 
   return (

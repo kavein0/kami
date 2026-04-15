@@ -32,6 +32,14 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "media.kitsu.app",
       },
+      {
+        protocol: "https",
+        hostname: "shikimori.one",
+      },
+      {
+        protocol: "https",
+        hostname: "shikimori.io",
+      },
     ],
   },
 };

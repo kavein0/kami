@@ -8,6 +8,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { NEON_BLUR_BASE64 } from "@/lib/image-utils";
+import type { TitleData } from "@/lib/types";
 
 export function GlobalSearch() {
   const dict = useDictionary();
@@ -15,7 +16,7 @@ export function GlobalSearch() {
   const [debouncedQuery, setDebouncedQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [results, setResults] = useState<any[]>([]);
+  const [results, setResults] = useState<TitleData[]>([]);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Handle click outside to close dropdown
@@ -142,7 +143,7 @@ export function GlobalSearch() {
                               <Calendar className="w-3 h-3" /> {title.year}
                             </span>
                           )}
-                          {title.rating > 0 && (
+                          {typeof title.rating === "number" && title.rating > 0 && (
                             <span className="flex items-center gap-1 text-neon-yellow">
                               <Star className="w-3 h-3 fill-neon-yellow" /> {title.rating.toFixed(1)}
                             </span>

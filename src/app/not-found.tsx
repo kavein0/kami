@@ -3,11 +3,8 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { Home, Sparkles } from "lucide-react";
-import { useDictionary } from "@/components/dictionary-provider";
 
 export default function NotFoundPage() {
-  const dict = useDictionary();
-
   return (
     <div className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden">
       {/* Background effects */}
@@ -39,10 +36,10 @@ export default function NotFoundPage() {
         </motion.div>
 
         <h1 className="text-2xl sm:text-3xl font-bold text-white mb-3">
-          {dict.errors?.notFound || "Page not found"}
+          Page not found
         </h1>
         <p className="text-dark-muted mb-8 max-w-md mx-auto">
-          {dict.errors?.notFoundDesc || "This page seems to have vanished into another dimension. Let's go back home!"}
+          This page seems to have vanished into another dimension. Let&apos;s go back home!
         </p>
 
         <Link
@@ -50,7 +47,7 @@ export default function NotFoundPage() {
           className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-gradient-to-r from-neon-cyan to-neon-purple text-dark-bg font-bold text-sm hover:opacity-90 transition-opacity neon-glow-cyan"
         >
           <Home className="w-5 h-5" />
-          {dict.errors?.goHome || "Go Home"}
+          Go Home
         </Link>
       </motion.div>
     </div>

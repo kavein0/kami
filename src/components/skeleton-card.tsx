@@ -1,7 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
-
 export function SkeletonCard() {
   return (
     <div className="h-full flex flex-col relative rounded-2xl bg-dark-card/50 border border-dark-border/50 overflow-hidden shadow-lg">

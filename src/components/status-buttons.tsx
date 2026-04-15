@@ -11,6 +11,7 @@ import {
   ChevronDown as ChevronDownIcon, 
   Check as CheckIcon 
 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { addToList } from "@/app/actions/list";
 import type { ListStatus } from "@/lib/types";
 import { useDictionary } from "./dictionary-provider";
@@ -25,7 +26,7 @@ export function StatusButtons({ titleId, currentStatus }: StatusButtonsProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
 
-  const statuses: { value: ListStatus; label: string; icon: any; color: string }[] = [
+  const statuses: { value: ListStatus; label: string; icon: LucideIcon; color: string }[] = [
     { value: "watched", label: dict.list.completed, icon: EyeIcon, color: "text-neon-cyan" },
     { value: "watching", label: dict.list.watching, icon: PlayIcon, color: "text-neon-green" },
     { value: "plan_to_watch", label: dict.list.planned, icon: ClockIcon, color: "text-neon-yellow" },

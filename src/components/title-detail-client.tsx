@@ -25,6 +25,7 @@ import { NEON_BLUR_BASE64 } from "@/lib/image-utils";
 import { ClientPageTransition } from "@/components/client-page-transition";
 import { useRef } from "react";
 import { useScroll, useTransform } from "framer-motion";
+import type { Dictionary } from "@/lib/i18n";
 
 function parseReviewContent(text: string) {
   if (!text) return null;
@@ -57,7 +58,7 @@ interface TitleDetailClientProps {
     createdAt: Date;
     user: { id: string; name: string | null; image: string | null };
   }>;
-  dict: any;
+  dict: Dictionary;
   malScore?: number | null;
 }
 

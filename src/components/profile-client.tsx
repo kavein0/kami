@@ -2,7 +2,6 @@
 
 import { motion } from "framer-motion";
 import {
-  User,
   Mail,
   Calendar,
   Edit3,
@@ -26,6 +25,7 @@ import { searchUsers } from "@/app/actions/social";
 import type { UserStats, UserSmall } from "@/lib/types";
 import { UploadButton } from "@/utils/uploadthing";
 import { PieChart, Pie, Cell, Tooltip as RechartsTooltip, ResponsiveContainer } from "recharts";
+import type { Dictionary } from "@/lib/i18n";
 
 
 
@@ -43,7 +43,7 @@ interface ProfileClientProps {
   topGenres: { name: string; value: number }[];
   followers: UserSmall[];
   following: UserSmall[];
-  dict: ReturnType<typeof import("@/lib/i18n").getDictionarySync>;
+  dict: Dictionary;
   lang: string;
 }
 
@@ -65,22 +65,24 @@ export function ProfileClient({
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<UserSmall[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+  const trimmedSearchQuery = searchQuery.trim();
 
   useEffect(() => {
-    if (!searchQuery.trim()) {
-      setSearchResults([]);
+    if (!trimmedSearchQuery) {
       return;
     }
 
     const timer = setTimeout(async () => {
       setIsSearching(true);
-      const res = await searchUsers(searchQuery);
+      const res = await searchUsers(trimmedSearchQuery);
       setSearchResults(res);
       setIsSearching(false);
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [searchQuery]);
+  }, [trimmedSearchQuery]);
+
+  const visibleSearchResults = trimmedSearchQuery ? searchResults : [];
 
   const handleSave = (formData: FormData) => {
     startTransition(async () => {
@@ -444,11 +446,11 @@ export function ProfileClient({
               )}
             </div>
 
-            {searchResults.length > 0 && searchQuery && (
+            {visibleSearchResults.length > 0 && trimmedSearchQuery && (
               <div className="glass-strong rounded-2xl p-4 border border-dark-border">
                 <h3 className="text-xs text-dark-muted mb-4 uppercase tracking-widest">{dict.common.search}</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {searchResults.map((u) => (
+                  {visibleSearchResults.map((u) => (
                     <Link key={u.id} href={`/users/${u.id}`} className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 transition-colors group">
                       <div className="w-10 h-10 rounded-full bg-dark-bg overflow-hidden border border-dark-border group-hover:border-neon-cyan/50 transition-colors">
                         {u.image ? (

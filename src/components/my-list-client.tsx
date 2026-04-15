@@ -1,18 +1,20 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { DragDropContext, Droppable, Draggable, DropResult } from "@hello-pangea/dnd";
-import { ListEntryData } from "@/lib/types";
+import { ListEntryData, ListStatus } from "@/lib/types";
 import { updateListEntry, removeFromList } from "@/app/actions/list";
 import { Star, MessageSquare, Trash2, Edit3, X, Save, LayoutGrid, List as ListIcon, Columns, Plus, Minus, Search, CheckSquare, Square } from "lucide-react";
+import type { Dictionary } from "@/lib/i18n";
 
 type ViewMode = "kanban" | "grid" | "list";
+type ListDictionary = Dictionary["list"];
 
 interface Props {
   entries: ListEntryData[];
-  dict: any;
+  dict: ListDictionary;
 }
 
 export function MyListClient({ entries: initialEntries, dict }: Props) {
@@ -22,7 +24,11 @@ export function MyListClient({ entries: initialEntries, dict }: Props) {
     { id: "watched", title: dict.completed, color: "border-neon-green/50 text-neon-green" },
     { id: "on_hold", title: dict.onHold, color: "border-neon-purple/50 text-neon-purple" },
     { id: "dropped", title: dict.dropped, color: "border-neon-pink/50 text-neon-pink" }
-  ];
+  ] as const satisfies ReadonlyArray<{
+    id: ListStatus;
+    title: string;
+    color: string;
+  }>;
 
   const [entries, setEntries] = useState<ListEntryData[]>(initialEntries);
   const [viewMode, setViewMode] = useState<ViewMode>("kanban");
@@ -130,7 +136,7 @@ export function MyListClient({ entries: initialEntries, dict }: Props) {
     setSelectedIds(newSet);
   };
 
-  const handleBulkMove = async (status: string) => {
+  const handleBulkMove = async (status: ListStatus) => {
     const ids = Array.from(selectedIds);
     // Optimistic
     setEntries(entries.map(e => ids.includes(e.id) ? { ...e, status } : e));
@@ -152,13 +158,15 @@ export function MyListClient({ entries: initialEntries, dict }: Props) {
     const { source, destination, draggableId } = result;
     if (!destination) return;
     if (source.droppableId === destination.droppableId) return; // ignore same column reorder for now
+    const destinationStatus = COLUMNS.find((column) => column.id === destination.droppableId)?.id;
+    if (!destinationStatus) return;
 
     // Optimistic update
-    setEntries(entries.map(e => e.id === draggableId ? { ...e, status: destination.droppableId } : e));
-    await updateListEntry(draggableId, { status: destination.droppableId });
+    setEntries(entries.map(e => e.id === draggableId ? { ...e, status: destinationStatus } : e));
+    await updateListEntry(draggableId, { status: destinationStatus });
   };
 
-  if (!mounted) return <div className="min-h-[50vh] flex items-center justify-center">{dict.loading || "Loading..."}</div>;
+  if (!mounted) return <div className="min-h-[50vh] flex items-center justify-center">Loading...</div>;
 
   return (
     <div className="flex flex-col gap-6">
@@ -181,7 +189,7 @@ export function MyListClient({ entries: initialEntries, dict }: Props) {
           </div>
           <div className="w-px h-8 bg-dark-border hidden sm:block" />
           <div className="flex flex-col hidden sm:flex">
-            <span className="text-xs text-dark-muted font-heading uppercase tracking-widest">{dict.totalTime || "Time Spent"}</span>
+            <span className="text-xs text-dark-muted font-heading uppercase tracking-widest">Time Spent</span>
             <span className="text-lg font-bold text-neon-cyan">
               {stats.days} <span className="text-xs text-dark-muted">{dict.days || "d"}</span> {stats.remainingHours} <span className="text-xs text-dark-muted">{dict.hours || "h"}</span>
             </span>
@@ -376,8 +384,9 @@ export function MyListClient({ entries: initialEntries, dict }: Props) {
             <div className="flex-1 flex gap-2 overflow-x-auto hide-scrollbar">
               <select 
                 onChange={(e) => {
-                  if (e.target.value) {
-                    handleBulkMove(e.target.value);
+                  const nextStatus = COLUMNS.find((column) => column.id === e.target.value)?.id;
+                  if (nextStatus) {
+                    handleBulkMove(nextStatus);
                     e.target.value = "";
                   }
                 }}
@@ -406,7 +415,7 @@ export function MyListClient({ entries: initialEntries, dict }: Props) {
 function EntryCardContent({ 
   entry, dict, isSelected, onToggleSelect, onEdit, onDelete, onProgressUpdate, showStatusBadge = false
 }: { 
-  entry: ListEntryData, dict: any, isSelected: boolean, onToggleSelect: () => void, onEdit: () => void, onDelete?: () => void, onProgressUpdate: (p: number) => void, showStatusBadge?: boolean 
+  entry: ListEntryData, dict: ListDictionary, isSelected: boolean, onToggleSelect: () => void, onEdit: () => void, onDelete?: () => void, onProgressUpdate: (p: number) => void, showStatusBadge?: boolean 
 }) {
   return (
     <div className="relative z-10 w-full h-full flex flex-col">
@@ -437,7 +446,7 @@ function EntryCardContent({
             </h4>
             <div className="flex flex-wrap items-center gap-2 mt-1">
               <span className="text-xs text-dark-muted">
-                {entry.title.type === "movie" ? (dict.typeMovie || "Movie") : entry.title.type === "series" ? (dict.typeSeries || "Series") : "Anime"}
+                {entry.title.type === "movie" ? "Movie" : entry.title.type === "series" ? "Series" : "Anime"}
               </span>
               {showStatusBadge && (
                 <span className="text-[10px] px-1.5 py-0.5 rounded bg-dark-border text-dark-muted lowercase">
@@ -509,7 +518,7 @@ function EntryCardContent({
   );
 }
 
-function QuickEditOverlay({ entry, dict, onClose, onSave }: { entry: ListEntryData, dict: any, onClose: () => void, onSave: (s: number, c: string) => void }) {
+function QuickEditOverlay({ entry, dict, onClose, onSave }: { entry: ListEntryData, dict: ListDictionary, onClose: () => void, onSave: (s: number, c: string) => void }) {
   const [score, setScore] = useState(entry.score || 0);
   const [comment, setComment] = useState(entry.comment || "");
 

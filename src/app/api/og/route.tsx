@@ -60,7 +60,7 @@ export async function GET(req: NextRequest) {
           <div style={{ display: 'flex', position: 'absolute', inset: 0, opacity: 0.3 }}>
             {image && (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={image} style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'blur(40px)' }} />
+              <img alt="" src={image} style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'blur(40px)' }} />
             )}
           </div>
           
@@ -106,6 +106,7 @@ export async function GET(req: NextRequest) {
               <div style={{ display: 'flex', borderRadius: 20, overflow: 'hidden', boxShadow: '0 0 40px rgba(0,240,255,0.3)', border: '2px solid rgba(255,255,255,0.1)' }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
+                  alt=""
                   src={image}
                   style={{
                     width: 380,
@@ -123,8 +124,9 @@ export async function GET(req: NextRequest) {
         height: 630,
       }
     );
-  } catch (e: any) {
-    console.log(`${e.message}`);
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Unknown OG image error";
+    console.error(message);
     return new Response(`Failed to generate the image`, {
       status: 500,
     });

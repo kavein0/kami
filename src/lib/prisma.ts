@@ -23,7 +23,7 @@ if (dbUrl.includes("pooler.supabase.com")) {
     }
     
     dbUrl = parsedUrl.toString();
-  } catch (err) {
+  } catch {
     console.error("Failed to parse DATABASE_URL");
   }
 }

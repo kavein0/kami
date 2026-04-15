@@ -3,12 +3,14 @@ import { getPopularAnime, searchAnime } from "@/lib/jikan";
 import { SearchBar } from "@/components/search-bar";
 import { Suspense } from "react";
 import { InfiniteScrollGrid } from "@/components/infinite-scroll-grid";
-import { ANIME_GENRES, MOVIE_GENRES, SERIES_GENRES, GenreConfig } from "@/lib/types";
+import { ANIME_GENRES, MOVIE_GENRES, SERIES_GENRES, GenreConfig, TitleData } from "@/lib/types";
 import { DropdownFilter } from "@/components/dropdown-filter";
 import Link from "next/link";
 import { getDictionary } from "@/lib/i18n";
 import { ActiveFilters } from "@/components/active-filters";
 import { ScrollToTop } from "@/components/scroll-to-top";
+
+type AnimeSortBy = NonNullable<Parameters<typeof getPopularAnime>[0]>["sortBy"];
 
 interface BrowsePageProps {
   searchParams: Promise<{
@@ -31,7 +33,7 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
     tab = "anime";
   }
 
-  let titles = [];
+  let titles: TitleData[] = [];
   let totalResults = 0;
 
   if (q) {
@@ -60,7 +62,7 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
           if (ids.length > 0) genreIds = ids.join(",");
         }
         
-        let sortMal = "members";
+        let sortMal: AnimeSortBy = "members";
         if (sort === "rating_desc") sortMal = "score";
         if (sort === "date_asc") sortMal = "start_date";
         if (sort === "date_desc") sortMal = "start_date";
@@ -70,14 +72,14 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
         const res = await getPopularAnime({
             page: 1,
             genreId: genreIds,
-            sortBy: sortMal as any,
+            sortBy: sortMal,
             sort: sortDir
         });
         titles = res.results;
         totalResults = res.totalResults;
     } else {
         let genreConfig: GenreConfig | undefined;
-        let fetchType: "tv" | "movie" = tab === "series" ? "tv" : "movie";
+        const fetchType: "tv" | "movie" = tab === "series" ? "tv" : "movie";
 
         if (tab === "series" && genre) {
           const names = genre.split(",");

@@ -6,9 +6,10 @@ import { Mail, Lock, User, UserPlus, Sparkles, Eye, EyeOff } from "lucide-react"
 import Link from "next/link";
 import { registerAction } from "@/app/actions/auth";
 import { useRouter } from "next/navigation";
+import type { Dictionary } from "@/lib/i18n";
 
 interface Props {
-  dict: any;
+  dict: Dictionary;
 }
 
 export function RegisterForm({ dict }: Props) {

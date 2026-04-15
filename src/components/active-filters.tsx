@@ -51,7 +51,7 @@ export function ActiveFilters() {
         )}
         {year && (
           <FilterBadge 
-            label={`${dict.browse.filtersYear}: ${year}`} 
+            label={`Year: ${year}`} 
             onRemove={() => removeParam("year")} 
           />
         )}
@@ -69,7 +69,7 @@ export function ActiveFilters() {
           onClick={clearAll}
           className="text-xs text-dark-muted hover:text-neon-pink transition-colors ml-2 font-medium"
         >
-          {dict.browse.clearAll || "Clear All"}
+          Clear All
         </button>
       )}
     </div>

@@ -1,16 +1,21 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+
+type DustParticle = {
+  left: string;
+  top: string;
+  duration: number;
+  delay: number;
+};
 
 export function BackgroundEffects() {
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) return null;
+  const particles: DustParticle[] = Array.from({ length: 25 }, (_, i) => ({
+    left: `${(i * 17) % 100}%`,
+    top: `${(i * 29) % 100}%`,
+    duration: 15 + (i % 6) * 3,
+    delay: (i % 8) * 0.8,
+  }));
 
   return (
     <div className="fixed inset-0 pointer-events-none -z-1 overflow-hidden bg-dark-bg">
@@ -44,13 +49,13 @@ export function BackgroundEffects() {
 
       {/* Subtle Floating Dust Particles */}
       <div className="absolute inset-0">
-        {[...Array(25)].map((_, i) => (
+        {particles.map((particle, i) => (
           <motion.div
             key={i}
             className="absolute w-1 h-1 rounded-full bg-white/40 shadow-[0_0_8px_rgba(255,255,255,0.5)]"
             style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
+              left: particle.left,
+              top: particle.top,
             }}
             animate={{
               y: [0, -150, 0],
@@ -58,10 +63,10 @@ export function BackgroundEffects() {
               scale: [0, 1.2, 0],
             }}
             transition={{
-              duration: 15 + Math.random() * 20,
+              duration: particle.duration,
               repeat: Infinity,
               ease: "linear",
-              delay: Math.random() * 10,
+              delay: particle.delay,
             }}
           />
         ))}

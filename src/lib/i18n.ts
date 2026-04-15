@@ -2,7 +2,181 @@ import { cookies } from "next/headers";
 
 export type Language = "ru" | "en";
 
-export const dictionaries = {
+export type Dictionary = {
+  nav: {
+    home: string;
+    catalog: string;
+    myList: string;
+    feed: string;
+    profile: string;
+    login: string;
+    logout: string;
+  };
+  common: {
+    loading: string;
+    error: string;
+    save: string;
+    cancel: string;
+    delete: string;
+    search: string;
+    noResults: string;
+  };
+  home: {
+    heroWatch: string;
+    heroDetails: string;
+    popularAnime: string;
+    recommendationOfDay: string;
+    topMovies: string;
+    topSeries: string;
+    genresTarget: string;
+    footerRights: string;
+    footerNote: string;
+  };
+  browse: {
+    title: string;
+    subtitle: string;
+    searchPlaceholder: string;
+    tabAnime: string;
+    tabMovies: string;
+    tabSeries: string;
+    filtersGenre: string;
+    filtersSort: string;
+    sortPopularity: string;
+    sortRating: string;
+    sortDate: string;
+    sortDateOldest: string;
+    filterAny: string;
+    foundPrefix: string;
+    resultsSuffix: string;
+    queryFor: string;
+    emptyState: string;
+    emptyDesc: string;
+    viewAll: string;
+    noResults: string;
+    selected: string;
+  };
+  list: {
+    title: string;
+    watching: string;
+    completed: string;
+    onHold: string;
+    dropped: string;
+    planned: string;
+    empty: string;
+    addFirst: string;
+    progress: string;
+    score: string;
+    total: string;
+    averageScore: string;
+    kanban: string;
+    grid: string;
+    table: string;
+    search: string;
+    bulkEdit: string;
+    bulkMove: string;
+    bulkDelete: string;
+    selectAll: string;
+    selectedCount: string;
+    cancel: string;
+    save: string;
+    edit: string;
+    deleteConfirm: string;
+    days: string;
+    hours: string;
+  };
+  details: {
+    status: string;
+    type: string;
+    episodes: string;
+    duration: string;
+    studio: string;
+    genres: string;
+    about: string;
+    trailer: string;
+    similar: string;
+    saveToList: string;
+    updateList: string;
+    reviews: string;
+    writeReview: string;
+    submit: string;
+  };
+  profile: {
+    overview: string;
+    social: string;
+    friends: string;
+    stats: string;
+    timeSpent: string;
+    genres: string;
+    achievements: string;
+    editProfile: string;
+    save: string;
+    followers: string;
+    following: string;
+    follow: string;
+    unfollow: string;
+    days: string;
+    hours: string;
+    statsByStatus: string;
+    noAchievements: string;
+    badgeNovice: string;
+    badgeNoviceDesc: string;
+    badgeRegular: string;
+    badgeRegularDesc: string;
+    badgeOtaku: string;
+    badgeOtakuDesc: string;
+    bio: string;
+    anonymous: string;
+    favoriteGenres: string;
+    notEnoughData: string;
+    notEnoughDataDesc: string;
+    timeSpentWatching: string;
+    noFollowers: string;
+  };
+  social: {
+    searchUser: string;
+    followers: string;
+    following: string;
+    findFriends: string;
+    noFriends: string;
+    friendsActivity: string;
+    allActivity: string;
+  };
+  feed: {
+    title: string;
+    subtitle: string;
+    reviewPosted: string;
+    listUpdated: string;
+    score: string;
+    added: string;
+    to: string;
+    reviewed: string;
+    empty: string;
+    emptyGuest: string;
+  };
+  genres: Record<string, string>;
+  genreDescriptions: Record<string, string>;
+  auth: {
+    loginTitle: string;
+    registerTitle: string;
+    email: string;
+    password: string;
+    name: string;
+    submitLogin: string;
+    submitRegister: string;
+    noAccount: string;
+    hasAccount: string;
+    errorNameExists: string;
+    errorEmailExists: string;
+    errorGeneric: string;
+    passwordMin: string;
+    loginSubtitle: string;
+    registerSubtitle: string;
+    errorEmailInvalid: string;
+    errorCredentials: string;
+  };
+};
+
+export const dictionaries: Record<Language, Dictionary> = {
   en: {
     nav: {
       home: "Home",

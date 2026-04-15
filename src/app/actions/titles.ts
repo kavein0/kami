@@ -17,7 +17,7 @@ export async function getRandomTitleAction() {
 
   try {
     if (selectedType === "anime") {
-      const data = await fetchJikan("/random/anime");
+      const data = await fetchJikan<{ mal_id?: number }>("/random/anime");
       if (data?.data?.mal_id) {
         id = `jikan_${data.data.mal_id}`;
       }

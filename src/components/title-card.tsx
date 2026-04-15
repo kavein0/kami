@@ -1,15 +1,13 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Star, Calendar, Play, Tv, Film } from "lucide-react";
+import { Star, Calendar, Tv, Film } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import type { TitleData } from "@/lib/types";
 import { useDictionary } from "./dictionary-provider";
 import { NEON_BLUR_BASE64 } from "@/lib/image-utils";
-import { GenreTooltip } from "./genre-tooltip";
-import { ANIME_GENRES, MOVIE_GENRES, SERIES_GENRES } from "@/lib/types";
 
 interface TitleCardProps {
   title: TitleData;
