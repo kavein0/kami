@@ -216,6 +216,37 @@ function extractYearFromDate(date?: string | null): number | null {
   return Number.isNaN(year) ? null : year;
 }
 
+/**
+ * Fetch a more accurate total count from Kitsu API when Jikan is down.
+ */
+async function fetchKitsuTotalCount(options: { search?: string, genre?: string } = {}): Promise<number | null> {
+  const { search, genre } = options;
+  let url = "https://kitsu.io/api/edge/anime?page[limit]=1";
+  
+  if (search) {
+    url += `&filter[text]=${encodeURIComponent(search)}`;
+  }
+  
+  // Note: Kitsu genres (categories) might not match Shikimori perfectly, 
+  // but it's better than a static number.
+  if (genre) {
+    url += `&filter[categories]=${encodeURIComponent(genre)}`;
+  }
+
+  try {
+    const res = await fetch(url, {
+      headers: { "User-Agent": "MiruVerse/1.0", "Accept": "application/vnd.api+json" },
+      next: { revalidate: 3600 } // Cache for 1 hour
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data.meta?.count || null;
+  } catch (error) {
+    console.error("Kitsu Count Error:", error);
+    return null;
+  }
+}
+
 function normalizeShikimoriGraphQLTitle(item: any, lang: "ru" | "en"): TitleData {
   const malId = item.myanimelist_id ?? parseInt(item.id);
   const poster =
@@ -516,10 +547,11 @@ async function fallbackSearchAnime(query: string, page: number): Promise<{ resul
   }
 
   const results = data.animes.map(item => normalizeShikimoriGraphQLTitle(item, lang));
+  const realCount = await fetchKitsuTotalCount({ search: query });
 
   return {
     results,
-    totalResults: results.length >= 20 ? 1000 : results.length, // GraphQL doesn't easily give total count without extra query
+    totalResults: realCount || (results.length >= 20 ? 1000 : results.length),
   };
 }
 
@@ -567,10 +599,11 @@ async function fallbackPopularAnime(options: {
   }
 
   const results = data.animes.map(item => normalizeShikimoriGraphQLTitle(item, lang));
+  const realCount = await fetchKitsuTotalCount({ genre: genreId?.toString() });
 
   return {
     results,
-    totalResults: results.length >= 20 ? 1000 : results.length,
+    totalResults: realCount || (results.length >= 20 ? 1000 : results.length),
   };
 }
 
