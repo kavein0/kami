@@ -26,12 +26,14 @@ export async function updateProfile(formData: FormData) {
     name: z.string().min(1).max(100).trim(),
     bio: z.string().max(500).trim(),
     image: z.string().url().optional().or(z.literal("")),
+    bannerImage: z.string().url().optional().or(z.literal("")),
   });
 
   const parsed = schema.safeParse({
     name: formData.get("name"),
     bio: formData.get("bio") || "",
     image: formData.get("image") || "",
+    bannerImage: formData.get("bannerImage") || "",
   });
 
   const dict = await getDictionary();
@@ -40,7 +42,7 @@ export async function updateProfile(formData: FormData) {
     return { error: dict.auth.errorGeneric };
   }
 
-  const { name, bio, image } = parsed.data;
+  const { name, bio, image, bannerImage } = parsed.data;
 
   // Check if name is taken by another user
   const existing = await prisma.user.findFirst({
@@ -52,9 +54,12 @@ export async function updateProfile(formData: FormData) {
 
   if (existing) return { error: dict.auth.errorNameExists };
 
-  const dataToUpdate: { name: string; bio: string; image?: string } = { name, bio };
+  const dataToUpdate: { name: string; bio: string; image?: string; bannerImage?: string } = { name, bio };
   if (image && (image.startsWith("https://") || image.startsWith("http://"))) {
     dataToUpdate.image = image;
+  }
+  if (bannerImage && (bannerImage.startsWith("https://") || bannerImage.startsWith("http://"))) {
+    dataToUpdate.bannerImage = bannerImage;
   }
 
   await prisma.user.update({

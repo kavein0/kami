@@ -20,6 +20,19 @@ export default async function ProfilePage() {
     redirect("/logout");
   }
 
+  // Get a fallback banner from user's most recent highly rated titles
+  const recentHighRated = await prisma.listEntry.findFirst({
+    where: { 
+      userId: user.id, 
+      status: { in: ["watched", "watching"] },
+      title: { backdrop: { not: null } }
+    },
+    orderBy: { score: "desc" },
+    include: { title: true }
+  });
+
+  const fallbackBanner = recentHighRated?.title.backdrop || null;
+
   const dict = await getDictionary();
   const lang = await getLanguage();
 
@@ -88,6 +101,7 @@ export default async function ProfilePage() {
         email: user.email || "",
         bio: user.bio,
         image: user.image,
+        bannerImage: user.bannerImage || fallbackBanner,
         createdAt: user.createdAt.toISOString(),
       }}
       stats={{
