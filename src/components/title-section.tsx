@@ -4,7 +4,8 @@ import { motion } from "framer-motion";
 import { ChevronRight, ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import { TitleCard } from "./title-card";
-import { useRef, useState, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
+import useEmblaCarousel from "embla-carousel-react";
 import type { TitleData } from "@/lib/types";
 import { useDictionary } from "./dictionary-provider";
 
@@ -17,7 +18,35 @@ interface TitleSectionProps {
 
 export function TitleSection({ title, icon, titles, href }: TitleSectionProps) {
   const dict = useDictionary();
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    align: "start",
+    dragFree: true,
+    containScroll: "trimSnaps",
+  });
+
+  const [canScrollPrev, setCanScrollPrev] = useState(false);
+  const [canScrollNext, setCanScrollNext] = useState(false);
+
+  const scrollPrev = useCallback(() => {
+    if (emblaApi) emblaApi.scrollPrev();
+  }, [emblaApi]);
+
+  const scrollNext = useCallback(() => {
+    if (emblaApi) emblaApi.scrollNext();
+  }, [emblaApi]);
+
+  const onSelect = useCallback(() => {
+    if (!emblaApi) return;
+    setCanScrollPrev(emblaApi.canScrollPrev());
+    setCanScrollNext(emblaApi.canScrollNext());
+  }, [emblaApi]);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    onSelect();
+    emblaApi.on("select", onSelect);
+    emblaApi.on("reInit", onSelect);
+  }, [emblaApi, onSelect]);
 
   return (
     <section className="py-8">
@@ -43,36 +72,34 @@ export function TitleSection({ title, icon, titles, href }: TitleSectionProps) {
           </Link>
         )}
       </div>
+      
       <div className="relative group">
         <button
-          onClick={() => {
-            if (scrollRef.current) {
-              scrollRef.current.scrollBy({ left: -scrollRef.current.clientWidth * 0.8, behavior: "smooth" });
-            }
-          }}
-          className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 lg:-translate-x-6 z-10 p-2 rounded-full bg-dark-surface/80 backdrop-blur border border-dark-border text-white opacity-0 group-hover:opacity-100 transition-all hover:bg-neon-cyan hover:text-black hidden md:flex hover:scale-110 shadow-xl shadow-black/50"
+          onClick={scrollPrev}
+          disabled={!canScrollPrev}
+          className={`absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 lg:-translate-x-6 z-10 p-2 rounded-full bg-dark-surface/80 backdrop-blur border border-dark-border text-white transition-all hover:bg-neon-cyan hover:text-black hidden md:flex hover:scale-110 shadow-xl shadow-black/50 ${
+            !canScrollPrev ? "opacity-0 pointer-events-none" : "opacity-0 group-hover:opacity-100"
+          }`}
         >
           <ChevronLeft className="w-5 h-5" />
         </button>
         
-        <div 
-          ref={scrollRef}
-          className="flex gap-4 sm:gap-5 overflow-x-auto hide-scrollbar scroll-smooth pb-6 pt-2 px-1 -mx-1"
-        >
-          {titles.map((t, i) => (
-            <div key={t.id} className="w-[140px] sm:w-[160px] md:w-[180px] lg:w-[200px] flex-shrink-0">
-              <TitleCard title={t} index={i} />
-            </div>
-          ))}
+        <div className="overflow-hidden pb-6 pt-2 px-1 -mx-1" ref={emblaRef}>
+          <div className="flex gap-4 sm:gap-5" style={{ touchAction: 'pan-y pinch-zoom' }}>
+            {titles.map((t, i) => (
+              <div key={t.id} className="w-[140px] sm:w-[160px] md:w-[180px] lg:w-[200px] flex-shrink-0 min-w-0">
+                <TitleCard title={t} index={i} />
+              </div>
+            ))}
+          </div>
         </div>
 
         <button
-          onClick={() => {
-            if (scrollRef.current) {
-              scrollRef.current.scrollBy({ left: scrollRef.current.clientWidth * 0.8, behavior: "smooth" });
-            }
-          }}
-          className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 lg:translate-x-6 z-10 p-2 rounded-full bg-dark-surface/80 backdrop-blur border border-dark-border text-white opacity-0 group-hover:opacity-100 transition-all hover:bg-neon-cyan hover:text-black hidden md:flex hover:scale-110 shadow-xl shadow-black/50"
+          onClick={scrollNext}
+          disabled={!canScrollNext}
+          className={`absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 lg:translate-x-6 z-10 p-2 rounded-full bg-dark-surface/80 backdrop-blur border border-dark-border text-white transition-all hover:bg-neon-cyan hover:text-black hidden md:flex hover:scale-110 shadow-xl shadow-black/50 ${
+            !canScrollNext ? "opacity-0 pointer-events-none" : "opacity-0 group-hover:opacity-100"
+          }`}
         >
           <ChevronRight className="w-5 h-5" />
         </button>
