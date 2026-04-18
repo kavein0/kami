@@ -16,11 +16,11 @@ type ListDictionary = Dictionary["list"];
 interface Props {
   entries: ListEntryData[];
   dict: ListDictionary;
+  lang: string;
 }
 
-export function MyListClient({ entries: initialEntries, dict }: Props) {
+export function MyListClient({ entries: initialEntries, dict, lang }: Props) {
   const fullDict = useDictionary();
-  const lang = fullDict.lang;
   const COLUMNS = [
     { id: "watching", title: dict.watching, color: "border-neon-cyan/50 text-neon-cyan" },
     { id: "plan_to_watch", title: dict.planned, color: "border-neon-yellow/50 text-neon-yellow" },
@@ -288,10 +288,11 @@ export function MyListClient({ entries: initialEntries, dict }: Props) {
                                   <EntryCardContent 
                                     entry={entry} 
                                     dict={dict} 
+                                    lang={lang}
                                     isSelected={selectedIds.has(entry.id)}
                                     onToggleSelect={() => toggleSelection(entry.id)}
                                     onEdit={() => setEditingId(entry.id)}
-                                    // Make progress edits trigger in Kanban too
+                                    onDelete={() => handleDelete(entry.id)}
                                     onProgressUpdate={(p) => handleUpdateProgress(entry.id, p)}
                                   />
                                 </div>
@@ -322,6 +323,7 @@ export function MyListClient({ entries: initialEntries, dict }: Props) {
                   <EntryCardContent 
                     entry={entry} 
                     dict={dict} 
+                    lang={lang}
                     isSelected={selectedIds.has(entry.id)}
                     onToggleSelect={() => toggleSelection(entry.id)}
                     onEdit={() => setEditingId(entry.id)}
@@ -431,12 +433,10 @@ export function MyListClient({ entries: initialEntries, dict }: Props) {
 
 // Reusable card content for Kanban and Grid
 function EntryCardContent({ 
-  entry, dict, isSelected, onToggleSelect, onEdit, onDelete, onProgressUpdate, showStatusBadge = false
+  entry, dict, lang, isSelected, onToggleSelect, onEdit, onDelete, onProgressUpdate, showStatusBadge = false
 }: { 
-  entry: ListEntryData, dict: ListDictionary, isSelected: boolean, onToggleSelect: () => void, onEdit: () => void, onDelete?: () => void, onProgressUpdate: (p: number) => void, showStatusBadge?: boolean 
+  entry: ListEntryData, dict: ListDictionary, lang: string, isSelected: boolean, onToggleSelect: () => void, onEdit: () => void, onDelete?: () => void, onProgressUpdate: (p: number) => void, showStatusBadge?: boolean 
 }) {
-  const fullDict = useDictionary();
-  const lang = fullDict.lang;
   return (
     <div className="relative z-10 w-full h-full flex flex-col">
       <div className="flex gap-3">
