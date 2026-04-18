@@ -256,7 +256,7 @@ export function MyListClient({ entries: initialEntries, dict }: Props) {
                         ref={provided.innerRef}
                         className={`min-w-[300px] w-[300px] flex-shrink-0 snap-center rounded-3xl glass-strong border ${
                           snapshot.isDraggingOver ? "bg-white/5 border-white/20" : "border-dark-border"
-                        } p-4 flex flex-col`}
+                        } p-4 flex flex-col min-h-[65vh]`}
                       >
                         <div className="mb-4 flex items-center gap-2">
                           <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full glass border text-sm font-bold uppercase tracking-widest ${col.color}`}>
@@ -266,7 +266,7 @@ export function MyListClient({ entries: initialEntries, dict }: Props) {
                           <span className="ml-auto text-xs font-mono text-dark-muted bg-dark-surface border border-dark-border px-2 py-0.5 rounded-full">{kanbanColumns[col.id].length}</span>
                         </div>
                         
-                        <div className="flex-1 flex flex-col gap-3 min-h-[150px] overflow-y-auto max-h-[70vh] pr-0.5">
+                        <div className="flex-1 flex flex-col gap-3 overflow-y-auto overflow-x-hidden pr-0.5 h-full">
                           {kanbanColumns[col.id].map((entry, index) => (
                             <Draggable key={entry.id} draggableId={entry.id} index={index}>
                               {(provided, snapshot) => (
@@ -292,7 +292,7 @@ export function MyListClient({ entries: initialEntries, dict }: Props) {
                             </Draggable>
                           ))}
                           {kanbanColumns[col.id].length === 0 && (
-                            <div className="flex flex-col items-center justify-center gap-3 flex-1 min-h-[150px] rounded-2xl border border-dashed border-dark-border/40 text-dark-muted/40 text-xs text-center px-4 py-6">
+                            <div className="flex flex-col items-center justify-center gap-3 flex-1 h-full min-h-[200px] rounded-2xl border border-dashed border-dark-border/40 text-dark-muted/40 text-xs text-center px-4 py-6 mb-2">
                               <span className="text-3xl opacity-30">✦</span>
                               <span className="font-medium">{dict.empty || "Empty"}</span>
                               <span className="text-[10px] opacity-60">Drag titles here</span>
