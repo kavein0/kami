@@ -20,8 +20,11 @@ export function TitleSection({ title, icon, titles, href }: TitleSectionProps) {
   const dict = useDictionary();
   const [emblaRef, emblaApi] = useEmblaCarousel({
     align: "start",
-    dragFree: true,
+    slidesToScroll: 3,
     containScroll: "trimSnaps",
+    breakpoints: {
+      '(max-width: 768px)': { slidesToScroll: 2 }
+    }
   });
 
   const [canScrollPrev, setCanScrollPrev] = useState(false);
