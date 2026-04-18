@@ -254,7 +254,7 @@ export function MyListClient({ entries: initialEntries, dict }: Props) {
                       <div
                         {...provided.droppableProps}
                         ref={provided.innerRef}
-                        className={`min-w-[300px] w-[300px] flex-shrink-0 snap-center rounded-3xl glass-strong border ${
+                        className={`flex-1 min-w-[280px] lg:min-w-[300px] snap-center rounded-3xl glass-strong border ${
                           snapshot.isDraggingOver ? "bg-white/5 border-white/20" : "border-dark-border"
                         } p-4 flex flex-col min-h-[65vh]`}
                       >
