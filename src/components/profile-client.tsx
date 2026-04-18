@@ -535,7 +535,7 @@ export function ProfileClient({
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {visibleSearchResults.map((u) => (
                     <Link key={u.id} href={`/users/${u.id}`} className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 transition-colors group">
-                      <div className="w-10 h-10 rounded-full bg-dark-bg overflow-hidden border border-dark-border group-hover:border-neon-cyan/50 transition-colors">
+                      <div className="relative w-10 h-10 rounded-full bg-dark-bg overflow-hidden border border-dark-border group-hover:border-neon-cyan/50 transition-colors">
                         {u.image ? (
                           <Image src={u.image} alt={u.name || ""} fill sizes="40px" className="object-cover" />
                         ) : (
