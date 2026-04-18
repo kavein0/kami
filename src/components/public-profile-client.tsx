@@ -80,17 +80,18 @@ export function PublicProfileClient({
   return (
     <div className="min-h-screen pb-12">
       {/* Hero Banner Section */}
-      <div className="relative h-[250px] sm:h-[350px] w-full overflow-hidden">
+      <div className="relative w-full overflow-hidden flex items-center justify-center max-h-[50vh] md:max-h-[60vh]">
         {user.bannerImage ? (
           <Image
             src={user.bannerImage}
             alt="Profile Banner"
-            fill
-            className="object-cover opacity-60"
+            width={1920}
+            height={1080}
+            className="w-full h-auto object-cover opacity-60 min-h-[250px] sm:min-h-[350px]"
             priority
           />
         ) : (
-          <div className="w-full h-full bg-linear-to-br from-dark-surface via-dark-bg to-dark-surface opacity-40" />
+          <div className="w-full h-[250px] sm:h-[350px] bg-linear-to-br from-dark-surface via-dark-bg to-dark-surface opacity-40" />
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-dark-bg via-dark-bg/20 to-transparent" />
         <div className="absolute inset-0 bg-radial-[at_50%_0%] from-neon-cyan/10 to-transparent pointer-events-none" />
