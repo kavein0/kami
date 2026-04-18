@@ -128,25 +128,27 @@ export function ProfileClient({
 
   return (
     <div className="min-h-screen pb-12">
-      {/* Hero Banner Section */}
-      <div className="relative w-full overflow-hidden flex items-center justify-center max-h-[50vh] md:max-h-[60vh]">
+      {/* Background Wallpaper Banner */}
+      <div className="absolute top-0 left-0 w-full h-[60vh] md:h-[80vh] overflow-hidden z-0 pointer-events-none">
         {user.bannerImage ? (
           <Image
             src={user.bannerImage}
             alt="Profile Banner"
-            width={1920}
-            height={1080}
-            className="w-full h-auto object-cover opacity-60 min-h-[250px] sm:min-h-[350px]"
+            fill
+            className="object-cover opacity-30"
             priority
           />
         ) : (
-          <div className="w-full h-[250px] sm:h-[350px] bg-linear-to-br from-dark-surface via-dark-bg to-dark-surface opacity-40" />
+          <div className="w-full h-[350px] bg-linear-to-br from-dark-surface via-dark-bg to-dark-surface opacity-40" />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-dark-bg via-dark-bg/20 to-transparent" />
-        <div className="absolute inset-0 bg-radial-[at_50%_0%] from-neon-cyan/10 to-transparent pointer-events-none" />
-        
+        <div className="absolute inset-0 bg-gradient-to-t from-dark-bg via-dark-bg/60 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-b from-dark-bg/60 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-radial-[at_50%_0%] from-neon-cyan/5 to-transparent" />
+      </div>
+
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 relative z-20 pt-32 sm:pt-48">
         {editing && (
-          <div className="absolute bottom-6 right-6 z-30">
+          <div className="absolute top-8 right-4 sm:right-6 z-30 pointer-events-auto">
              <label className="cursor-pointer bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-xl px-6 py-2.5 hover:bg-white/20 transition-all shadow-2xl font-bold text-sm flex items-center gap-2 group/upload">
                 <ImageIcon className="w-4 h-4 group-hover/upload:scale-110 transition-transform" />
                 <span>{dict.profile.editProfile}</span>
@@ -165,9 +167,7 @@ export function ProfileClient({
              </label>
           </div>
         )}
-      </div>
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 -mt-20 relative z-20">
         {/* Profile card */}
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
