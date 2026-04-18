@@ -120,11 +120,9 @@ async function waitRateLimit() {
 export function normalizeJikanTitle(item: JikanAnime): TitleData {
   const id = `jikan_${item.mal_id}`;
   
-  // Find backdrop - Try trailer maxres, otherwise large poster
+  // Find backdrop - Try trailer maxres or large
   const backdrop = item.trailer?.images?.maximum_image_url 
     || item.trailer?.images?.large_image_url 
-    || item.images?.webp?.large_image_url
-    || item.images?.jpg?.large_image_url
     || null;
 
   // Poster: try webp first, then jpg fallback
@@ -253,7 +251,7 @@ function normalizeShikimoriGraphQLTitle(item: any, lang: "ru" | "en"): TitleData
     toAbsoluteShikimoriUrl(item.poster?.originalUrl) ??
     toAbsoluteShikimoriUrl(item.image?.original);
   
-  const backdrop = toAbsoluteShikimoriUrl(item.screenshots?.[0]?.originalUrl) ?? poster;
+  const backdrop = toAbsoluteShikimoriUrl(item.screenshots?.[0]?.originalUrl) ?? null;
   const score = item.score ? parseFloat(item.score.toString()) : 0;
 
   return {
@@ -282,7 +280,7 @@ function normalizeShikimoriTitle(item: ShikimoriAnime, lang: "ru" | "en"): Title
     toAbsoluteShikimoriUrl(item.image?.original) ??
     toAbsoluteShikimoriUrl(item.image?.preview) ??
     toAbsoluteShikimoriUrl(item.image?.x96);
-  const backdrop = toAbsoluteShikimoriUrl(item.screenshots?.[0]?.original) ?? poster;
+  const backdrop = toAbsoluteShikimoriUrl(item.screenshots?.[0]?.original) ?? null;
   const score =
     typeof item.score === "number"
       ? item.score

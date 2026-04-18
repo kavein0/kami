@@ -45,13 +45,23 @@ export function HeroBanner({ title }: HeroBannerProps) {
         style={{ y, opacity }}
         className="absolute inset-0 w-full h-[120%] -top-[10%]"
       >
+        {/* Blurry background for when we only have a poster */}
         <Image
           src={title.backdrop || title.poster || ""}
           alt={title.name}
           fill
           priority
           sizes="100vw"
-          className="object-cover opacity-60"
+          className="object-cover opacity-40 blur-3xl saturate-150"
+        />
+        {/* Main image - covers if it's a real backdrop, contained to the right if it's a vertical poster */}
+        <Image
+          src={title.backdrop || title.poster || ""}
+          alt={title.name}
+          fill
+          priority
+          sizes="100vw"
+          className={`opacity-60 ${title.backdrop ? 'object-cover' : 'object-contain object-right lg:object-[85%_top]'}`}
           placeholder="blur"
           blurDataURL={NEON_BLUR_BASE64}
         />

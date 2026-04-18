@@ -111,16 +111,28 @@ export function TitleDetailClient({
            className="absolute inset-0 w-full h-[120%] -top-[10%]"
         >
           {title.backdrop || title.poster ? (
-             <Image
-                src={title.backdrop || title.poster || ""}
-                alt={`${title.name} backdrop`}
-                fill
-                priority
-                className="object-cover opacity-60"
-                sizes="100vw"
-                placeholder="blur"
-                blurDataURL={NEON_BLUR_BASE64}
-             />
+             <>
+                {/* Blurry background for when we only have a poster */}
+                <Image
+                  src={title.backdrop || title.poster || ""}
+                  alt={`${title.name} backdrop`}
+                  fill
+                  priority
+                  className="object-cover opacity-40 blur-3xl saturate-150"
+                  sizes="100vw"
+                />
+                {/* Main image - covers if it's a real backdrop, contained to the right if it's a vertical poster */}
+                <Image
+                  src={title.backdrop || title.poster || ""}
+                  alt={`${title.name} backdrop`}
+                  fill
+                  priority
+                  className={`opacity-60 ${title.backdrop ? 'object-cover' : 'object-contain object-right lg:object-[85%_top]'}`}
+                  sizes="100vw"
+                  placeholder="blur"
+                  blurDataURL={NEON_BLUR_BASE64}
+                />
+             </>
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-dark-card to-dark-bg" />
           )}
