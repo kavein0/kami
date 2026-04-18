@@ -129,44 +129,36 @@ export function ProfileClient({
   return (
     <div className="min-h-screen pb-12">
       {/* Background Wallpaper Banner */}
-      <div className="absolute top-0 left-0 w-full h-[60vh] md:h-[80vh] overflow-hidden z-0 pointer-events-none">
+      <div className="fixed top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none flex justify-center">
         {user.bannerImage ? (
-          <Image
-            src={user.bannerImage}
-            alt="Profile Banner"
-            fill
-            className="object-cover opacity-30"
-            priority
-          />
+          <>
+            {/* Blurry background to cover empty sides if portrait */}
+            <Image
+              src={user.bannerImage}
+              alt="Profile Banner Blur"
+              fill
+              className="object-cover opacity-20 blur-3xl saturate-150"
+              priority
+            />
+            {/* Uncropped main image */}
+            <Image
+              src={user.bannerImage}
+              alt="Profile Banner"
+              fill
+              className="object-contain opacity-50 object-top lg:object-right-top"
+              priority
+            />
+          </>
         ) : (
-          <div className="w-full h-[350px] bg-linear-to-br from-dark-surface via-dark-bg to-dark-surface opacity-40" />
+          <div className="w-full h-full bg-linear-to-br from-dark-surface via-dark-bg to-dark-surface opacity-40" />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-dark-bg via-dark-bg/60 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-b from-dark-bg/60 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-dark-bg/20 mix-blend-multiply" />
+        <div className="absolute inset-0 bg-gradient-to-t from-dark-bg via-dark-bg/80 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-b from-dark-bg/80 via-dark-bg/20 to-transparent" />
         <div className="absolute inset-0 bg-radial-[at_50%_0%] from-neon-cyan/5 to-transparent" />
       </div>
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 relative z-20 pt-32 sm:pt-48">
-        {editing && (
-          <div className="absolute top-8 right-4 sm:right-6 z-30 pointer-events-auto">
-             <label className="cursor-pointer bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-xl px-6 py-2.5 hover:bg-white/20 transition-all shadow-2xl font-bold text-sm flex items-center gap-2 group/upload">
-                <ImageIcon className="w-4 h-4 group-hover/upload:scale-110 transition-transform" />
-                <span>{dict.profile.editProfile}</span>
-                <input
-                  type="file"
-                  className="hidden"
-                  accept="image/*"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) handleCustomUpload(file, "bannerImage");
-                  }}
-                />
-                {isUploading && (
-                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                )}
-             </label>
-          </div>
-        )}
 
         {/* Profile card */}
         <motion.div
@@ -174,6 +166,26 @@ export function ProfileClient({
           animate={{ opacity: 1, scale: 1 }}
           className="glass-strong rounded-3xl p-6 sm:p-8 border border-white/10 mb-8 shadow-2xl relative overflow-hidden group"
         >
+          {editing && (
+            <div className="absolute top-4 right-4 sm:top-6 sm:right-6 z-30 pointer-events-auto">
+               <label className="cursor-pointer bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-xl px-4 py-2 hover:bg-white/20 transition-all shadow-xl font-bold text-xs flex items-center gap-2 group/upload">
+                  <ImageIcon className="w-3 h-3 group-hover/upload:scale-110 transition-transform" />
+                  <span className="hidden sm:inline">{dict.profile.editProfile}</span>
+                  <input
+                    type="file"
+                    className="hidden"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) handleCustomUpload(file, "bannerImage");
+                    }}
+                  />
+                  {isUploading && (
+                    <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  )}
+               </label>
+            </div>
+          )}
           <div className="absolute top-0 right-0 w-64 h-64 bg-neon-cyan/10 rounded-full blur-[120px] -mr-32 -mt-32 transition-opacity group-hover:opacity-100 opacity-60 pointer-events-none" />
           
           <div className="flex flex-col sm:flex-row items-center sm:items-start gap-8">

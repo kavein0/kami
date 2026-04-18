@@ -80,20 +80,32 @@ export function PublicProfileClient({
   return (
     <div className="min-h-screen pb-12">
       {/* Background Wallpaper Banner */}
-      <div className="absolute top-0 left-0 w-full h-[60vh] md:h-[80vh] overflow-hidden z-0 pointer-events-none">
+      <div className="fixed top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none flex justify-center">
         {user.bannerImage ? (
-          <Image
-            src={user.bannerImage}
-            alt="Profile Banner"
-            fill
-            className="object-cover opacity-30"
-            priority
-          />
+          <>
+            {/* Blurry background to cover empty sides if portrait */}
+            <Image
+              src={user.bannerImage}
+              alt="Profile Banner Blur"
+              fill
+              className="object-cover opacity-20 blur-3xl saturate-150"
+              priority
+            />
+            {/* Uncropped main image */}
+            <Image
+              src={user.bannerImage}
+              alt="Profile Banner"
+              fill
+              className="object-contain opacity-50 object-top lg:object-right-top"
+              priority
+            />
+          </>
         ) : (
-          <div className="w-full h-[350px] bg-linear-to-br from-dark-surface via-dark-bg to-dark-surface opacity-40" />
+          <div className="w-full h-full bg-linear-to-br from-dark-surface via-dark-bg to-dark-surface opacity-40" />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-dark-bg via-dark-bg/60 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-b from-dark-bg/60 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-dark-bg/20 mix-blend-multiply" />
+        <div className="absolute inset-0 bg-gradient-to-t from-dark-bg via-dark-bg/80 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-b from-dark-bg/80 via-dark-bg/20 to-transparent" />
         <div className="absolute inset-0 bg-radial-[at_50%_0%] from-neon-cyan/5 to-transparent" />
       </div>
 
