@@ -36,8 +36,10 @@ async function ensureTitleExists(titleId: string) {
   
   if (!titleData) throw new Error("Title not found");
 
-  await prisma.title.create({
-    data: {
+  await prisma.title.upsert({
+    where: { id: titleId },
+    update: {},
+    create: {
       id: titleId,
       name: titleData.name,
       nameEn: titleData.nameEn,
