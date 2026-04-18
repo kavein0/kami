@@ -3,18 +3,19 @@
 import { useState, useTransition } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Eye as EyeIcon, 
-  Play as PlayIcon, 
-  Clock as ClockIcon, 
-  Pause as PauseIcon, 
-  X as XIcon, 
-  ChevronDown as ChevronDownIcon, 
-  Check as CheckIcon 
+  Eye as EyeIcon,
+  Play as PlayIcon,
+  Clock as ClockIcon,
+  Pause as PauseIcon,
+  X as XIcon,
+  ChevronDown as ChevronDownIcon,
+  Check as CheckIcon,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { addToList } from "@/app/actions/list";
 import type { ListStatus } from "@/lib/types";
 import { useDictionary } from "./dictionary-provider";
+import toast from "react-hot-toast";
 
 interface StatusButtonsProps {
   titleId: string;
@@ -37,9 +38,15 @@ export function StatusButtons({ titleId, currentStatus }: StatusButtonsProps) {
   const current = statuses.find((s) => s.value === currentStatus);
 
   const handleStatusChange = (status: ListStatus) => {
+    const label = statuses.find((s) => s.value === status)?.label || status;
     startTransition(async () => {
-      await addToList(titleId, status);
-      setIsOpen(false);
+      try {
+        await addToList(titleId, status);
+        toast.success(label);
+        setIsOpen(false);
+      } catch {
+        toast.error(dict.common.error);
+      }
     });
   };
 

@@ -14,6 +14,7 @@ const loadMoreSchema = z.object({
   genre: z.string().optional(),
   year: z.string().optional(),
   sort: z.string().optional(),
+  status: z.string().optional(),
 });
 
 export async function loadMoreTitles(params: {
@@ -23,78 +24,111 @@ export async function loadMoreTitles(params: {
   genre?: string;
   year?: string;
   sort?: string;
-}) {
+  status?: string;
+}): Promise<{ titles: TitleData[]; hasMore: boolean }> {
   const parsed = loadMoreSchema.safeParse(params);
-  if (!parsed.success) return [];
+  if (!parsed.success) return { titles: [], hasMore: false };
 
-  const { page, q, tab, genre, year, sort } = parsed.data;
+  const { page, q, tab, genre, year, sort, status } = parsed.data;
   let titles: TitleData[] = [];
+  const PAGE_SIZE = 20;
 
-  if (q) {
-    if (tab === "anime") {
-      const res = await searchAnime(q, page);
-      titles = res.results;
+  try {
+    if (q) {
+      if (tab === "anime") {
+        const res = await searchAnime(q, page);
+        titles = res.results;
+      } else {
+        const res = await searchTitles(q, page);
+        titles = res.results;
+        if (tab === "movie") titles = titles.filter((t) => t.type === "movie");
+        if (tab === "series") titles = titles.filter((t) => t.type === "series");
+      }
     } else {
-      const res = await searchTitles(q, page);
-      titles = res.results;
-      if (tab === "movie") titles = titles.filter(t => t.type === "movie");
-      if (tab === "series") titles = titles.filter(t => t.type === "series");
-    }
-  } else {
-    // Determine fetch parameters based on tab selection
-    if (tab === "anime") {
+      if (tab === "anime") {
         let genreIds;
         if (genre) {
-          const ids = genre.split(",").map(n => ANIME_GENRES.find(g => g.name === n?.trim())?.id).filter(Boolean);
+          const ids = genre
+            .split(",")
+            .map((n) => ANIME_GENRES.find((g) => g.name === n?.trim())?.id)
+            .filter(Boolean);
           if (ids.length > 0) genreIds = ids.join(",");
         }
-        
+
         let sortMal: AnimeSortBy = "members";
         if (sort === "rating_desc") sortMal = "score";
         if (sort === "date_asc") sortMal = "start_date";
         if (sort === "date_desc") sortMal = "start_date";
-        
+
         const sortDir = sort === "date_asc" ? "asc" : "desc";
-        
+
         const res = await getPopularAnime({
-            page,
-            genreId: genreIds,
-            sortBy: sortMal,
-            sort: sortDir
+          page,
+          genreId: genreIds,
+          sortBy: sortMal,
+          sort: sortDir,
+          status: status || undefined,
         });
         titles = res.results;
-    } else {
+      } else {
         let genreConfig: { id: string | number; type: string } | undefined;
         const fetchType: "tv" | "movie" = tab === "series" ? "tv" : "movie";
 
         if (tab === "series" && genre) {
-          const ids = genre.split(",").map(n => SERIES_GENRES.find(g => g.name === n?.trim())?.id).filter(Boolean);
+          const ids = genre
+            .split(",")
+            .map((n) => SERIES_GENRES.find((g) => g.name === n?.trim())?.id)
+            .filter(Boolean);
           if (ids.length > 0) genreConfig = { id: ids.join("|"), type: "genre" };
         } else if (tab === "movie" && genre) {
-          const ids = genre.split(",").map(n => MOVIE_GENRES.find(g => g.name === n?.trim())?.id).filter(Boolean);
+          const ids = genre
+            .split(",")
+            .map((n) => MOVIE_GENRES.find((g) => g.name === n?.trim())?.id)
+            .filter(Boolean);
           if (ids.length > 0) genreConfig = { id: ids.join("|"), type: "genre" };
         }
 
-        const sortConfig = 
-          sort === "rating_desc" ? "vote_average.desc" : 
-          sort === "date_desc" ? (fetchType === "tv" ? "first_air_date.desc" : "primary_release_date.desc") : 
-          sort === "date_asc" ? (fetchType === "tv" ? "first_air_date.asc" : "primary_release_date.asc") :
-          "popularity.desc";
+        const sortConfig =
+          sort === "rating_desc"
+            ? "vote_average.desc"
+            : sort === "date_desc"
+            ? fetchType === "tv"
+              ? "first_air_date.desc"
+              : "primary_release_date.desc"
+            : sort === "date_asc"
+            ? fetchType === "tv"
+              ? "first_air_date.asc"
+              : "primary_release_date.asc"
+            : "popularity.desc";
 
         const res = await getPopularTitles(fetchType, {
-            filterAnime: false,
-            page,
-            genreId: genreConfig?.type === "genre" ? genreConfig.id : undefined,
-            keywordId: genreConfig?.type === "keyword" ? genreConfig.id : undefined,
-            sortBy: sortConfig as "popularity.desc" | "vote_average.desc" | "primary_release_date.desc" | "first_air_date.desc" | "primary_release_date.asc" | "first_air_date.asc"
+          filterAnime: false,
+          page,
+          genreId: genreConfig?.type === "genre" ? genreConfig.id : undefined,
+          keywordId: genreConfig?.type === "keyword" ? genreConfig.id : undefined,
+          sortBy: sortConfig as
+            | "popularity.desc"
+            | "vote_average.desc"
+            | "primary_release_date.desc"
+            | "first_air_date.desc"
+            | "primary_release_date.asc"
+            | "first_air_date.asc",
         });
         titles = res.results;
+      }
     }
+  } catch (error) {
+    console.error("[loadMoreTitles] fetch error:", error);
+    return { titles: [], hasMore: false };
   }
 
+  // Apply year filter on every page (not just the first)
   if (year) {
-    titles = titles.filter(t => t.year === parseInt(year));
+    titles = titles.filter((t) => t.year === parseInt(year));
   }
 
-  return titles;
+  return {
+    titles,
+    hasMore: titles.length >= PAGE_SIZE,
+  };
 }

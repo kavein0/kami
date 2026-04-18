@@ -640,19 +640,24 @@ export async function getPopularAnime(
     genreId?: number | string;
     sortBy?: "score" | "members" | "favorites" | "start_date";
     sort?: "asc" | "desc";
+    status?: string;
   } = {}
 ): Promise<{ results: TitleData[], totalResults: number }> {
-  const { page = 1, genreId, sortBy = "members", sort = "desc" } = options;
+  const { page = 1, genreId, sortBy = "members", sort = "desc", status } = options;
 
   const params: Record<string, string> = {
     page: page.toString(),
-    limit: "20", // Matches PAGE_SIZE for consistent pagination
+    limit: "20",
     order_by: sortBy === "start_date" ? "start_date" : sortBy,
     sort: sort,
   };
-  
+
+  // Apply status filter (e.g. "airing" for currently airing anime)
+  if (status) {
+    params["status"] = status;
+  }
+
   if (genreId) {
-    // If we have a genre filter, we must use /anime endpoint instead of /top/anime
     params["genres"] = genreId.toString();
     
     const data = await fetchJikan<JikanAnime[]>("/anime", params);
@@ -668,8 +673,8 @@ export async function getPopularAnime(
       totalResults: data.pagination?.items?.total || (results.length >= 20 ? 1000 : results.length)
     };
   } else {
-    // Default Top Anime or Sorted List
-    const endpoint = sortBy === "score" ? "/top/anime" : "/anime";
+    // If status filter is set, always use /anime (not /top/anime)
+    const endpoint = (sortBy === "score" && !status) ? "/top/anime" : "/anime";
     
     const data = await fetchJikan<JikanAnime[]>(endpoint, params);
     if (!data.data || data.data.length === 0) {

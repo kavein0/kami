@@ -18,9 +18,10 @@ interface Props {
   genre?: string;
   year?: string;
   sort?: string;
+  status?: string;
 }
 
-export function InfiniteScrollGrid({ initialTitles, q, tab, genre, year, sort }: Props) {
+export function InfiniteScrollGrid({ initialTitles, q, tab, genre, year, sort, status }: Props) {
   const dict = useDictionary();
   const [titles, setTitles] = useState<TitleData[]>(initialTitles);
   const [isLoading, setIsLoading] = useState(false);
@@ -43,12 +44,11 @@ export function InfiniteScrollGrid({ initialTitles, q, tab, genre, year, sort }:
   };
 
   useEffect(() => {
-    // Reset state if filters change
     setTitles(initialTitles);
     pageRef.current = 1;
     setHasMore(initialTitles.length >= PAGE_SIZE);
-    isFetchingRef.current = false; // Reset fetching flag to allow new loads
-  }, [initialTitles, q, tab, genre, year, sort]);
+    isFetchingRef.current = false;
+  }, [initialTitles, q, tab, genre, year, sort, status]);
 
   const fetchMore = useCallback(async () => {
     if (isFetchingRef.current || !hasMore) return;
@@ -56,25 +56,23 @@ export function InfiniteScrollGrid({ initialTitles, q, tab, genre, year, sort }:
     isFetchingRef.current = true;
     const nextPage = pageRef.current + 1;
     try {
-      const moreTitles = await loadMoreTitles({
+      const { titles: moreTitles, hasMore: moreAvailable } = await loadMoreTitles({
         page: nextPage,
         q,
         tab,
         genre,
         year,
-        sort
+        sort,
+        status,
       });
 
-      if (moreTitles.length === 0) {
-        setHasMore(false);
-      } else {
-        if (moreTitles.length < PAGE_SIZE) {
-          setHasMore(false);
-        }
+      // Server already tells us if there's more — trust it
+      setHasMore(moreAvailable);
 
+      if (moreTitles.length > 0) {
         setTitles((prev) => {
-          const existingIds = new Set(prev.map(t => t.id));
-          const uniques = moreTitles.filter(t => !existingIds.has(t.id));
+          const existingIds = new Set(prev.map((t) => t.id));
+          const uniques = moreTitles.filter((t) => !existingIds.has(t.id));
           if (uniques.length === 0) {
             setHasMore(false);
             return prev;
@@ -90,7 +88,7 @@ export function InfiniteScrollGrid({ initialTitles, q, tab, genre, year, sort }:
       setIsLoading(false);
       isFetchingRef.current = false;
     }
-  }, [q, tab, genre, year, sort, hasMore]);
+  }, [q, tab, genre, year, sort, status, hasMore]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -99,7 +97,7 @@ export function InfiniteScrollGrid({ initialTitles, q, tab, genre, year, sort }:
           fetchMore();
         }
       },
-      { rootMargin: '600px' }
+      { rootMargin: "600px" }
     );
 
     const target = observerTarget.current;
@@ -149,7 +147,7 @@ export function InfiniteScrollGrid({ initialTitles, q, tab, genre, year, sort }:
           ))}
         </div>
       )}
-      
+
       {hasMore && (
         <div ref={observerTarget} className="h-10 invisible" />
       )}

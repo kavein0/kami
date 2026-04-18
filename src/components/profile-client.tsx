@@ -18,7 +18,7 @@ import {
   Star,
   Image as ImageIcon,
 } from "lucide-react";
-import { useState, useTransition, useEffect } from "react";
+import { useState, useTransition, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { updateProfile } from "@/app/actions/preferences";
@@ -28,6 +28,7 @@ import { useUploadThing } from "@/utils/uploadthing";
 import { PieChart, Pie, Cell, Tooltip as RechartsTooltip, ResponsiveContainer } from "recharts";
 import type { Dictionary } from "@/lib/i18n";
 import { AnimatedNumber } from "./animated-number";
+import toast from "react-hot-toast";
 
 
 
@@ -70,16 +71,9 @@ export function ProfileClient({
   const [isSearching, setIsSearching] = useState(false);
   const trimmedSearchQuery = searchQuery.trim();
 
+  const formRef = useRef<HTMLFormElement>(null);
+
   const { startUpload, isUploading } = useUploadThing("imageUploader", {
-    onClientUploadComplete: (res) => {
-      if (res && res[0]) {
-        const formData = new FormData();
-        formData.append("name", user.name || "");
-        formData.append("bio", user.bio || "");
-        // We determine which field to update based on what we just selected
-        // In this implementation, we'll use separate calls for avatar and banner logic
-      }
-    },
     onUploadError: (error) => {
       alert(`${dict.common.error}: ${error.message}`);
     },
@@ -89,8 +83,11 @@ export function ProfileClient({
     const res = await startUpload([file]);
     if (res && res[0]) {
       const formData = new FormData();
-      formData.append("name", user.name || "");
-      formData.append("bio", user.bio || "");
+      // Read current form values from the DOM to preserve any unsaved edits
+      const nameEl = formRef.current?.querySelector<HTMLInputElement>("[name='name']");
+      const bioEl = formRef.current?.querySelector<HTMLTextAreaElement>("[name='bio']");
+      formData.append("name", nameEl?.value ?? user.name ?? "");
+      formData.append("bio", bioEl?.value ?? user.bio ?? "");
       formData.append(type, res[0].url);
       handleSave(formData);
     }
@@ -117,6 +114,7 @@ export function ProfileClient({
     startTransition(async () => {
       await updateProfile(formData);
       setEditing(false);
+      toast.success(dict.profile.save);
     });
   };
 
@@ -212,7 +210,7 @@ export function ProfileClient({
 
             <div className="flex-1 text-center sm:text-left pt-2">
               {editing ? (
-                <form action={handleSave} className="space-y-4">
+                <form ref={formRef} action={handleSave} className="space-y-4">
                   <div>
                     <label className="block text-[10px] font-bold text-dark-muted mb-1.5 uppercase tracking-widest">
                       {dict.auth.name}

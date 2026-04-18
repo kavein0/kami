@@ -9,6 +9,7 @@ import Link from "next/link";
 import { getDictionary } from "@/lib/i18n";
 import { ActiveFilters } from "@/components/active-filters";
 import { ScrollToTop } from "@/components/scroll-to-top";
+import { X } from "lucide-react";
 
 type AnimeSortBy = NonNullable<Parameters<typeof getPopularAnime>[0]>["sortBy"];
 
@@ -19,12 +20,13 @@ interface BrowsePageProps {
     genre?: string;
     year?: string;
     sort?: string;
+    status?: string;
   }>;
 }
 
 export default async function BrowsePage({ searchParams }: BrowsePageProps) {
   const params = await searchParams;
-  const { q, genre, year, sort } = params;
+  const { q, genre, year, sort, status } = params;
   let tab = params.tab;
   const dict = await getDictionary();
 
@@ -50,71 +52,81 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
       } else if (!tab) {
         tab = "anime";
       }
-      if (tab === "movie") titles = titles.filter(t => t.type === "movie");
-      if (tab === "series") titles = titles.filter(t => t.type === "series");
+      if (tab === "movie") titles = titles.filter((t) => t.type === "movie");
+      if (tab === "series") titles = titles.filter((t) => t.type === "series");
     }
   } else {
     if (tab === "anime") {
-        let genreIds;
-        if (genre) {
-          const names = genre.split(",");
-          const ids = names.map(n => ANIME_GENRES.find(g => g.name === n?.trim())?.id).filter(Boolean);
-          if (ids.length > 0) genreIds = ids.join(",");
-        }
-        
-        let sortMal: AnimeSortBy = "members";
-        if (sort === "rating_desc") sortMal = "score";
-        if (sort === "date_asc") sortMal = "start_date";
-        if (sort === "date_desc") sortMal = "start_date";
-        
-        const sortDir = sort === "date_asc" ? "asc" : "desc";
-        
-        const res = await getPopularAnime({
-            page: 1,
-            genreId: genreIds,
-            sortBy: sortMal,
-            sort: sortDir
-        });
-        titles = res.results;
-        totalResults = res.totalResults;
+      let genreIds;
+      if (genre) {
+        const names = genre.split(",");
+        const ids = names.map((n) => ANIME_GENRES.find((g) => g.name === n?.trim())?.id).filter(Boolean);
+        if (ids.length > 0) genreIds = ids.join(",");
+      }
+
+      let sortMal: AnimeSortBy = "members";
+      if (sort === "rating_desc") sortMal = "score";
+      if (sort === "date_asc") sortMal = "start_date";
+      if (sort === "date_desc") sortMal = "start_date";
+
+      const sortDir = sort === "date_asc" ? "asc" : "desc";
+
+      const res = await getPopularAnime({
+        page: 1,
+        genreId: genreIds,
+        sortBy: sortMal,
+        sort: sortDir,
+        // Pass status filter for "Currently Airing"
+        ...(status === "airing" ? { status: "airing" } : {}),
+      });
+      titles = res.results;
+      totalResults = res.totalResults;
     } else {
-        let genreConfig: GenreConfig | undefined;
-        const fetchType: "tv" | "movie" = tab === "series" ? "tv" : "movie";
+      let genreConfig: GenreConfig | undefined;
+      const fetchType: "tv" | "movie" = tab === "series" ? "tv" : "movie";
 
-        if (tab === "series" && genre) {
-          const names = genre.split(",");
-          const ids = names.map(n => SERIES_GENRES.find(g => g.name === n?.trim())?.id).filter(Boolean);
-          if (ids.length > 0) genreConfig = { id: ids.join("|"), name: genre, type: "genre" };
-        } else if (tab === "movie" && genre) {
-          const names = genre.split(",");
-          const ids = names.map(n => MOVIE_GENRES.find(g => g.name === n?.trim())?.id).filter(Boolean);
-          if (ids.length > 0) genreConfig = { id: ids.join("|"), name: genre, type: "genre" };
-        }
+      if (tab === "series" && genre) {
+        const names = genre.split(",");
+        const ids = names.map((n) => SERIES_GENRES.find((g) => g.name === n?.trim())?.id).filter(Boolean);
+        if (ids.length > 0) genreConfig = { id: ids.join("|"), name: genre, type: "genre" };
+      } else if (tab === "movie" && genre) {
+        const names = genre.split(",");
+        const ids = names.map((n) => MOVIE_GENRES.find((g) => g.name === n?.trim())?.id).filter(Boolean);
+        if (ids.length > 0) genreConfig = { id: ids.join("|"), name: genre, type: "genre" };
+      }
 
-        const sortConfig = 
-          sort === "rating_desc" ? "vote_average.desc" : 
-          sort === "date_desc" ? (fetchType === "tv" ? "first_air_date.desc" : "primary_release_date.desc") : 
-          sort === "date_asc" ? (fetchType === "tv" ? "first_air_date.asc" : "primary_release_date.asc") :
-          "popularity.desc";
+      const sortConfig =
+        sort === "rating_desc"
+          ? "vote_average.desc"
+          : sort === "date_desc"
+          ? fetchType === "tv"
+            ? "first_air_date.desc"
+            : "primary_release_date.desc"
+          : sort === "date_asc"
+          ? fetchType === "tv"
+            ? "first_air_date.asc"
+            : "primary_release_date.asc"
+          : "popularity.desc";
 
-        const res = await getPopularTitles(fetchType, {
-            filterAnime: false,
-            page: 1,
-            genreId: genreConfig?.type === "genre" ? genreConfig.id : undefined,
-            keywordId: genreConfig?.type === "keyword" ? genreConfig.id : undefined,
-            sortBy: sortConfig
-        });
-        titles = res.results;
-        totalResults = res.totalResults;
+      const res = await getPopularTitles(fetchType, {
+        filterAnime: false,
+        page: 1,
+        genreId: genreConfig?.type === "genre" ? genreConfig.id : undefined,
+        keywordId: genreConfig?.type === "keyword" ? genreConfig.id : undefined,
+        sortBy: sortConfig,
+      });
+      titles = res.results;
+      totalResults = res.totalResults;
     }
   }
 
-  // Client-side quick filter for remaining params
+  // Client-side quick filter for year
   if (year) {
     titles = titles.filter((t) => t.year === parseInt(year));
   }
-  
-  const hasFilters = q || tab || genre || year || sort;
+
+  const hasActiveFilters = !!(genre || year || sort || status);
+  const hasFilters = q || tab || genre || year || sort || status;
 
   const tabs = [
     { id: "anime", label: dict.browse.tabAnime, genres: ANIME_GENRES },
@@ -123,6 +135,9 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
   ];
 
   const currentTabObj = tabs.find((t) => t.id === tab) || tabs[0];
+
+  // Build reset URL — keep tab but clear all filters
+  const resetUrl = `/browse?tab=${tab || "anime"}`;
 
   return (
     <div className="min-h-screen pt-24 pb-12">
@@ -134,9 +149,7 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
               {dict.browse.title}
             </span>
           </h1>
-          <p className="text-dark-muted">
-            {dict.browse.subtitle}
-          </p>
+          <p className="text-dark-muted">{dict.browse.subtitle}</p>
         </div>
 
         {/* Search */}
@@ -144,7 +157,7 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
           <SearchBar />
         </Suspense>
 
-        {/* TABS & GENRES */}
+        {/* TABS & FILTERS */}
         {!q && (
           <div className="mt-8 mb-4">
             <div className="flex overflow-x-auto hide-scrollbar border-b border-dark-border mb-6">
@@ -164,7 +177,7 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
               ))}
             </div>
 
-            <div className="flex flex-wrap gap-4 items-center mt-2">
+            <div className="flex flex-wrap gap-3 items-center mt-2">
               <DropdownFilter
                 label={dict.browse.filtersGenre}
                 paramKey="genre"
@@ -174,14 +187,10 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
                 options={currentTabObj.genres.map((g) => {
                   const localizedLabel = (dict.genres as Record<string, string>)[g.name] || g.name;
                   const localizedDesc = (dict.genreDescriptions as Record<string, string>)?.[g.name] || g.description;
-                  return {
-                    label: localizedLabel,
-                    value: g.name,
-                    description: localizedDesc,
-                  };
+                  return { label: localizedLabel, value: g.name, description: localizedDesc };
                 })}
               />
-              
+
               <DropdownFilter
                 label={dict.browse.filtersSort}
                 paramKey="sort"
@@ -193,28 +202,69 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
                   { label: dict.browse.sortDateOldest || "Oldest First", value: "date_asc" },
                 ]}
               />
+
+              {/* Currently Airing — only for anime tab */}
+              {tab === "anime" && (
+                <Link
+                  href={
+                    status === "airing"
+                      ? `/browse?tab=anime${genre ? `&genre=${genre}` : ""}${sort ? `&sort=${sort}` : ""}`
+                      : `/browse?tab=anime&status=airing${genre ? `&genre=${genre}` : ""}${sort ? `&sort=${sort}` : ""}`
+                  }
+                  className={`flex items-center gap-2 px-4 py-2 rounded-xl border text-sm font-medium transition-all duration-200 ${
+                    status === "airing"
+                      ? "bg-neon-green/10 border-neon-green/40 text-neon-green"
+                      : "border-dark-border text-dark-muted hover:text-neon-green hover:border-neon-green/30"
+                  }`}
+                >
+                  <span className={`w-2 h-2 rounded-full ${status === "airing" ? "bg-neon-green animate-pulse" : "bg-dark-border"}`} />
+                  {dict.browse.tabAnime} — Airing
+                </Link>
+              )}
+
+              {/* Reset filters button — shows when any filter is active */}
+              {hasActiveFilters && (
+                <Link
+                  href={resetUrl}
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-xl border border-dark-border text-dark-muted text-sm hover:text-neon-pink hover:border-neon-pink/30 transition-all duration-200 ml-auto"
+                >
+                  <X className="w-3.5 h-3.5" />
+                  {dict.common.cancel}
+                </Link>
+              )}
             </div>
           </div>
         )}
 
         <Suspense>
-           <ActiveFilters />
+          <ActiveFilters />
         </Suspense>
 
         {hasFilters && (
           <div className="mt-6 mb-4 flex items-center justify-between flex-wrap gap-4 border-t border-dark-border/50 pt-6">
             <p className="text-dark-muted text-sm">
-              {dict.browse.foundPrefix} <span className="text-neon-cyan font-semibold">{totalResults}</span> {dict.browse.resultsSuffix}
+              {dict.browse.foundPrefix}{" "}
+              <span className="text-neon-cyan font-semibold">{totalResults}</span>{" "}
+              {dict.browse.resultsSuffix}
               {q && (
                 <span>
-                  {" "}{dict.browse.queryFor} «<span className="text-dark-text">{q}</span>»
+                  {" "}
+                  {dict.browse.queryFor} «<span className="text-dark-text">{q}</span>»
                 </span>
               )}
             </p>
           </div>
         )}
 
-        <InfiniteScrollGrid initialTitles={titles} q={q} tab={tab} genre={genre} year={year} sort={sort} />
+        <InfiniteScrollGrid
+          initialTitles={titles}
+          q={q}
+          tab={tab}
+          genre={genre}
+          year={year}
+          sort={sort}
+          status={status}
+        />
         <ScrollToTop />
       </div>
     </div>

@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { motion } from "framer-motion";
+import { useState, useTransition, useRef } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
 import {
   Star,
   Calendar,
@@ -13,7 +13,9 @@ import {
   BarChart3,
   ArrowLeft,
   MessageSquare,
-  Send
+  Send,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -23,18 +25,15 @@ import { TitleCard } from "@/components/title-card";
 import type { TitleData } from "@/lib/types";
 import { NEON_BLUR_BASE64 } from "@/lib/image-utils";
 import { ClientPageTransition } from "@/components/client-page-transition";
-import { useRef } from "react";
-import { useScroll, useTransform } from "framer-motion";
 import type { Dictionary } from "@/lib/i18n";
+
+const DESCRIPTION_LIMIT = 300;
 
 function parseReviewContent(text: string) {
   if (!text) return null;
-  // Match @username. Username can contain alphanumerics, underscores, and cyrillic letters.
   const mentionRegex = /@([a-zA-Z0-9_а-яА-Я-]+)/g;
   const parts = text.split(mentionRegex);
-  
   return parts.map((part, i) => {
-    // Every odd index in split() output with 1 capture group is the captured mention
     if (i % 2 === 1) {
       return (
         <Link key={i} href={`/users/${encodeURIComponent(part)}`} className="text-neon-cyan hover:underline font-medium">
@@ -74,16 +73,8 @@ export function TitleDetailClient({
   const genres = title.genres ? title.genres.split(",") : [];
   const [reviewText, setReviewText] = useState("");
   const [isPending, startTransition] = useTransition();
-
-  const handleReviewSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!reviewText.trim()) return;
-    
-    startTransition(async () => {
-      await submitReview(title.id, reviewText, userEntry?.score || 0);
-      setReviewText("");
-    });
-  };
+  const [descExpanded, setDescExpanded] = useState(false);
+  const descTooLong = (title.description?.length ?? 0) > DESCRIPTION_LIMIT;
 
   const ref = useRef(null);
   const { scrollYProgress } = useScroll({
@@ -91,6 +82,15 @@ export function TitleDetailClient({
     offset: ["start start", "end start"],
   });
   const y = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
+
+  const handleReviewSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!reviewText.trim()) return;
+    startTransition(async () => {
+      await submitReview(title.id, reviewText, userEntry?.score || 0);
+      setReviewText("");
+    });
+  };
 
   let youtubeId: string | null = null;
   try {
@@ -263,11 +263,27 @@ export function TitleDetailClient({
               })}
             </div>
 
-            {/* Description */}
+            {/* Description with Read More toggle */}
             {title.description && (
-              <p className="text-dark-text/80 leading-relaxed text-base">
-                {title.description}
-              </p>
+              <div>
+                <p className="text-dark-text/80 leading-relaxed text-base">
+                  {descTooLong && !descExpanded
+                    ? title.description.slice(0, DESCRIPTION_LIMIT) + "…"
+                    : title.description}
+                </p>
+                {descTooLong && (
+                  <button
+                    onClick={() => setDescExpanded((v) => !v)}
+                    className="flex items-center gap-1 mt-2 text-sm text-neon-cyan hover:text-neon-cyan/80 transition-colors font-medium"
+                  >
+                    {descExpanded ? (
+                      <><ChevronUp className="w-4 h-4" /> {dict.common.cancel}</>
+                    ) : (
+                      <><ChevronDown className="w-4 h-4" /> {dict.details.about}</>
+                    )}
+                  </button>
+                )}
+              </div>
             )}
 
             {/* Status buttons */}
@@ -333,7 +349,7 @@ export function TitleDetailClient({
         {/* Reviews Section */}
         <section className="mt-12 pb-24 max-w-3xl">
           <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
-            <MessageSquare className="w-5 h-5 text-neon-cyan" /> 
+            <MessageSquare className="w-5 h-5 text-neon-cyan" />
             {dict.details.reviews} ({reviews.length})
           </h2>
 
@@ -349,8 +365,8 @@ export function TitleDetailClient({
                 <span className="text-xs text-dark-muted">
                   {userEntry?.score ? `${dict.list.score}: ${userEntry.score}/10` : ""}
                 </span>
-                <button 
-                  type="submit" 
+                <button
+                  type="submit"
                   disabled={isPending || !reviewText.trim()}
                   className="px-6 py-2 bg-neon-cyan text-black font-bold text-sm rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center gap-2"
                 >
@@ -369,7 +385,7 @@ export function TitleDetailClient({
             {reviews.length === 0 ? (
               <p className="text-dark-muted text-center py-8">{dict.common.noResults}</p>
             ) : (
-              reviews.map(review => (
+              reviews.map((review) => (
                 <div key={review.id} className="p-4 rounded-2xl glass-strong border border-dark-border">
                   <div className="flex items-center gap-3 mb-3">
                     <Link href={`/users/${review.user.id}`} className="w-10 h-10 rounded-full bg-dark-border overflow-hidden relative shrink-0 border border-dark-border hover:border-neon-cyan/50 transition-colors">
