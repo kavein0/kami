@@ -57,7 +57,7 @@ export function TitleSection({ title, icon, titles, href }: TitleSectionProps) {
         
         <div 
           ref={scrollRef}
-          className="flex gap-4 sm:gap-5 overflow-x-auto snap-x snap-mandatory hide-scrollbar pb-6 pt-2 px-1 -mx-1"
+          className="flex gap-4 sm:gap-5 overflow-x-auto snap-x snap-mandatory hide-scrollbar scroll-smooth pb-6 pt-2 px-1 -mx-1"
         >
           {titles.map((t, i) => (
             <div key={t.id} className="w-[140px] sm:w-[160px] md:w-[180px] lg:w-[200px] flex-shrink-0 snap-start">
