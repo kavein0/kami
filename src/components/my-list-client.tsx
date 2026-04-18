@@ -8,6 +8,7 @@ import { ListEntryData, ListStatus } from "@/lib/types";
 import { updateListEntry, removeFromList } from "@/app/actions/list";
 import { Star, MessageSquare, Trash2, Edit3, X, Save, LayoutGrid, List as ListIcon, Columns, Plus, Minus, Search, CheckSquare, Square } from "lucide-react";
 import type { Dictionary } from "@/lib/i18n";
+import { useDictionary } from "./dictionary-provider";
 
 type ViewMode = "kanban" | "grid" | "list";
 type ListDictionary = Dictionary["list"];
@@ -18,6 +19,8 @@ interface Props {
 }
 
 export function MyListClient({ entries: initialEntries, dict }: Props) {
+  const fullDict = useDictionary();
+  const lang = fullDict.lang;
   const COLUMNS = [
     { id: "watching", title: dict.watching, color: "border-neon-cyan/50 text-neon-cyan" },
     { id: "plan_to_watch", title: dict.planned, color: "border-neon-yellow/50 text-neon-yellow" },
@@ -44,7 +47,8 @@ export function MyListClient({ entries: initialEntries, dict }: Props) {
     };
     entries.forEach(e => {
       // Apply search filter to Kanban too
-      if (searchQuery && !e.title.name.toLowerCase().includes(searchQuery.toLowerCase())) return;
+      const titleName = lang === "en" ? (e.title.nameEn || e.title.name) : e.title.name;
+      if (searchQuery && !titleName.toLowerCase().includes(searchQuery.toLowerCase())) return;
       if (grouped[e.status]) grouped[e.status].push(e);
     });
     return grouped;
@@ -54,8 +58,11 @@ export function MyListClient({ entries: initialEntries, dict }: Props) {
   const filteredEntries = useMemo(() => {
     if (!searchQuery) return entries;
     const lowerQ = searchQuery.toLowerCase();
-    return entries.filter(e => e.title.name.toLowerCase().includes(lowerQ));
-  }, [entries, searchQuery]);
+    return entries.filter(e => {
+      const titleName = lang === "en" ? (e.title.nameEn || e.title.name) : e.title.name;
+      return titleName.toLowerCase().includes(lowerQ);
+    });
+  }, [entries, searchQuery, lang]);
 
   // Derived Stats
   const stats = useMemo(() => {
@@ -428,6 +435,8 @@ function EntryCardContent({
 }: { 
   entry: ListEntryData, dict: ListDictionary, isSelected: boolean, onToggleSelect: () => void, onEdit: () => void, onDelete?: () => void, onProgressUpdate: (p: number) => void, showStatusBadge?: boolean 
 }) {
+  const fullDict = useDictionary();
+  const lang = fullDict.lang;
   return (
     <div className="relative z-10 w-full h-full flex flex-col">
       <div className="flex gap-3">
@@ -452,8 +461,8 @@ function EntryCardContent({
         {/* Content */}
         <div className="flex flex-col flex-1 justify-between py-1">
           <div>
-            <h4 className="font-bold text-sm leading-tight line-clamp-2 text-white" title={entry.title.name} onClick={onToggleSelect}>
-              {entry.title.name}
+            <h4 className="font-bold text-sm leading-tight line-clamp-2 text-white" title={lang === "en" ? (entry.title.nameEn || entry.title.name) : entry.title.name} onClick={onToggleSelect}>
+              {lang === "en" ? (entry.title.nameEn || entry.title.name) : entry.title.name}
             </h4>
             <div className="flex flex-wrap items-center gap-2 mt-1">
               <span className="text-xs text-dark-muted">
