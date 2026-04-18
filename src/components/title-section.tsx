@@ -1,9 +1,10 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import { TitleCard } from "./title-card";
+import { useRef, useState, useEffect } from "react";
 import type { TitleData } from "@/lib/types";
 import { useDictionary } from "./dictionary-provider";
 
@@ -16,6 +17,7 @@ interface TitleSectionProps {
 
 export function TitleSection({ title, icon, titles, href }: TitleSectionProps) {
   const dict = useDictionary();
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   return (
     <section className="py-8">
@@ -41,10 +43,39 @@ export function TitleSection({ title, icon, titles, href }: TitleSectionProps) {
           </Link>
         )}
       </div>
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-        {titles.map((t, i) => (
-          <TitleCard key={t.id} title={t} index={i} />
-        ))}
+      <div className="relative group">
+        <button
+          onClick={() => {
+            if (scrollRef.current) {
+              scrollRef.current.scrollBy({ left: -scrollRef.current.clientWidth * 0.8, behavior: "smooth" });
+            }
+          }}
+          className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 lg:-translate-x-6 z-10 p-2 rounded-full bg-dark-surface/80 backdrop-blur border border-dark-border text-white opacity-0 group-hover:opacity-100 transition-all hover:bg-neon-cyan hover:text-black hidden md:flex hover:scale-110 shadow-xl shadow-black/50"
+        >
+          <ChevronLeft className="w-5 h-5" />
+        </button>
+        
+        <div 
+          ref={scrollRef}
+          className="flex gap-4 sm:gap-5 overflow-x-auto snap-x snap-mandatory hide-scrollbar pb-6 pt-2 px-1 -mx-1"
+        >
+          {titles.map((t, i) => (
+            <div key={t.id} className="w-[140px] sm:w-[160px] md:w-[180px] lg:w-[200px] flex-shrink-0 snap-start">
+              <TitleCard title={t} index={i} />
+            </div>
+          ))}
+        </div>
+
+        <button
+          onClick={() => {
+            if (scrollRef.current) {
+              scrollRef.current.scrollBy({ left: scrollRef.current.clientWidth * 0.8, behavior: "smooth" });
+            }
+          }}
+          className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 lg:translate-x-6 z-10 p-2 rounded-full bg-dark-surface/80 backdrop-blur border border-dark-border text-white opacity-0 group-hover:opacity-100 transition-all hover:bg-neon-cyan hover:text-black hidden md:flex hover:scale-110 shadow-xl shadow-black/50"
+        >
+          <ChevronRight className="w-5 h-5" />
+        </button>
       </div>
     </section>
   );

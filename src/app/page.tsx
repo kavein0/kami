@@ -83,26 +83,26 @@ export default async function HomePage() {
         <TitleSection
           title={dict.feed.title || "For You"}
           icon={<Sparkles className="w-6 h-6 text-neon-cyan animate-pulse-neon" />}
-          titles={activityTitles.slice(0, 12)}
+          titles={activityTitles.slice(0, 20)}
         />
         <TitleSection
           title={dict.home.popularAnime}
           icon={<Flame className="w-6 h-6 text-neon-pink" />}
-          titles={topAnime.slice(0, 6)}
+          titles={topAnime.slice(0, 20)}
           href="/browse?tab=anime&sort=rating_desc"
         />
 
         <TitleSection
           title={dict.home.topMovies}
           icon={<Clapperboard className="w-6 h-6 text-neon-yellow" />}
-          titles={topMovies.slice(0, 6)}
+          titles={topMovies.slice(0, 20)}
           href="/browse?tab=movie&sort=rating_desc"
         />
 
         <TitleSection
           title={dict.home.topSeries}
           icon={<TrendingUp className="w-6 h-6 text-neon-green" />}
-          titles={topSeries.slice(0, 6)}
+          titles={topSeries.slice(0, 20)}
           href="/browse?tab=series&sort=rating_desc"
         />
 
