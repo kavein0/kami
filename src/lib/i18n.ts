@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 export type Language = "ru" | "en";
 
 export type Dictionary = {
+  lang: Language;
   nav: {
     home: string;
     catalog: string;
@@ -184,6 +185,7 @@ export type Dictionary = {
 
 export const dictionaries: Record<Language, Dictionary> = {
   en: {
+    lang: "en",
     nav: {
       home: "Home",
       catalog: "Browse",
@@ -544,6 +546,7 @@ export const dictionaries: Record<Language, Dictionary> = {
     }
   },
   ru: {
+    lang: "ru",
     nav: {
       home: "Главная",
       catalog: "Каталог",
@@ -833,12 +836,12 @@ export async function getLanguage(): Promise<Language> {
   return "ru";
 }
 
-export async function getDictionary() {
+export async function getDictionary(): Promise<Dictionary> {
   const lang = await getLanguage();
   return dictionaries[lang];
 }
 
 // Client-compatible synchronous getter, requires passing initial lang from Server to Client Context
-export function getDictionarySync(lang: Language) {
+export function getDictionarySync(lang: Language): Dictionary {
   return dictionaries[lang];
 }
