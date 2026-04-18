@@ -406,6 +406,10 @@ export const dictionaries: Record<Language, Dictionary> = {
       "Shoujo": "Shoujo",
       "Seinen": "Seinen",
       "Josei": "Josei",
+      // New / previously missing genres
+      "Erotica": "Erotica",
+      "Love Status Quo": "Love Status Quo",
+      "Urban Fantasy": "Urban Fantasy",
     },
     genreDescriptions: {
       "Action": "Dynamic scenes, battles, and non-stop action.",
@@ -483,6 +487,10 @@ export const dictionaries: Record<Language, Dictionary> = {
       "Shoujo": "Targeted mainly at teen girls with emotion and relationship focus.",
       "Seinen": "Targeted at adult men with mature themes and tone.",
       "Josei": "Targeted at adult women with realistic relationships and daily life themes.",
+      // New genres
+      "Erotica": "Explicit romantic or sexual content going beyond Ecchi.",
+      "Love Status Quo": "Romantic tension where neither party dares to confess first.",
+      "Urban Fantasy": "Magic and supernatural elements set in a modern city environment.",
       // TMDB
       "Animation": "Animated works and cartoons.",
       "Crime": "The criminal underworld and investigations.",
@@ -754,7 +762,12 @@ export const dictionaries: Record<Language, Dictionary> = {
        "Seinen": "Сэйнэн",
        "Josei": "Дзёсэй",
        "Kids": "Детское",
-       // TMDB exact English strings
+       // New / previously missing genres
+       "Erotica": "Эротика",
+       "Love Status Quo": "Любовный статус-кво",
+       "Urban Fantasy": "Городское фэнтези",
+       // Old name kept for backwards compat with existing entries in the DB
+       // (MAL renamed this to "Love Status Quo" in 2024)
        "Animation": "Мультфильм",
        "Crime": "Криминал",
        "Documentary": "Документальный",
