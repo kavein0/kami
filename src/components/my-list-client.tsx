@@ -189,7 +189,7 @@ export function MyListClient({ entries: initialEntries, dict }: Props) {
           </div>
           <div className="w-px h-8 bg-dark-border hidden sm:block" />
           <div className="flex flex-col hidden sm:flex">
-            <span className="text-xs text-dark-muted font-heading uppercase tracking-widest">Time Spent</span>
+            <span className="text-xs text-dark-muted font-heading uppercase tracking-widest">{dict.timeSpent || "Time Spent"}</span>
             <span className="text-lg font-bold text-neon-cyan">
               {stats.days} <span className="text-xs text-dark-muted">{dict.days || "d"}</span> {stats.remainingHours} <span className="text-xs text-dark-muted">{dict.hours || "h"}</span>
             </span>
@@ -295,7 +295,7 @@ export function MyListClient({ entries: initialEntries, dict }: Props) {
                             <div className="flex flex-col items-center justify-center gap-3 flex-1 h-full min-h-[200px] rounded-2xl border border-dashed border-dark-border/40 text-dark-muted/40 text-xs text-center px-4 py-6 mb-2">
                               <span className="text-3xl opacity-30">✦</span>
                               <span className="font-medium">{dict.empty || "Empty"}</span>
-                              <span className="text-[10px] opacity-60">Drag titles here</span>
+                              <span className="text-[10px] opacity-60">{dict.dragTitlesHere || "Drag titles here"}</span>
                             </div>
                           )}
                           {provided.placeholder}
@@ -457,7 +457,7 @@ function EntryCardContent({
             </h4>
             <div className="flex flex-wrap items-center gap-2 mt-1">
               <span className="text-xs text-dark-muted">
-                {entry.title.type === "movie" ? "Movie" : entry.title.type === "series" ? "Series" : "Anime"}
+                {entry.title.type === "movie" ? (dict.typeMovie || "Movie") : entry.title.type === "series" ? (dict.typeSeries || "Series") : (dict.typeAnime || "Anime")}
               </span>
               {showStatusBadge && (
                 <span className="text-[10px] px-1.5 py-0.5 rounded bg-dark-border text-dark-muted lowercase">
@@ -558,7 +558,7 @@ function QuickEditOverlay({ entry, dict, onClose, onSave }: { entry: ListEntryDa
             />
           </div>
           <div>
-            <label className="text-xs text-dark-muted mb-1.5 block uppercase tracking-wider font-semibold">Comment</label>
+            <label className="text-xs text-dark-muted mb-1.5 block uppercase tracking-wider font-semibold">{dict.comment || "Comment"}</label>
             <textarea 
               value={comment} onChange={(e) => setComment(e.target.value)}
               className="w-full h-[80px] bg-black/50 border border-dark-border rounded-xl p-3 text-sm outline-none focus:border-neon-cyan transition-colors resize-none"

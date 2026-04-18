@@ -399,7 +399,7 @@ export function TitleDetailClient({
                     </Link>
                     <div>
                       <Link href={`/users/${review.user.id}`} className="font-bold text-sm hover:text-neon-cyan transition-colors">
-                        {review.user.name || "Anon"}
+                        {review.user.name || dict.profile.anonymous || "Anonymous"}
                       </Link>
                       <div className="text-xs text-dark-muted">{new Date(review.createdAt).toLocaleDateString()}</div>
                     </div>

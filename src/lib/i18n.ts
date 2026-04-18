@@ -83,6 +83,12 @@ export type Dictionary = {
     deleteConfirm: string;
     days: string;
     hours: string;
+    dragTitlesHere: string;
+    timeSpent: string;
+    comment: string;
+    typeAnime: string;
+    typeMovie: string;
+    typeSeries: string;
   };
   details: {
     status: string;
@@ -257,7 +263,13 @@ export const dictionaries: Record<Language, Dictionary> = {
       edit: "Edit",
       deleteConfirm: "Delete selected items?",
       days: "days",
-      hours: "hrs"
+      hours: "hrs",
+      dragTitlesHere: "Drag titles here",
+      timeSpent: "Time Spent",
+      comment: "Comment",
+      typeAnime: "Anime",
+      typeMovie: "Movie",
+      typeSeries: "Series"
     },
     details: {
       status: "Status",
@@ -611,7 +623,13 @@ export const dictionaries: Record<Language, Dictionary> = {
       edit: "Изменить",
       deleteConfirm: "Удалить выбранные?",
       days: "дн.",
-      hours: "ч."
+      hours: "ч.",
+      dragTitlesHere: "Перетащите тайтлы сюда",
+      timeSpent: "Потрачено времени",
+      comment: "Комментарий",
+      typeAnime: "Аниме",
+      typeMovie: "Фильм",
+      typeSeries: "Сериал"
     },
     details: {
       status: "Статус",
