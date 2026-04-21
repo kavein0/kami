@@ -90,6 +90,8 @@ export function Navbar({ lang, dict, user }: NavbarProps) {
       animate="visible"
       className="fixed top-0 left-0 right-0 z-50"
     >
+      {/* Universal protection scrim: Ensures text is always readable over any hero banner */}
+      <div className="absolute top-0 left-0 right-0 h-40 bg-gradient-to-b from-black/80 via-dark-bg/50 to-transparent pointer-events-none -z-10" />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-3">
         {/* ── Floating island ───────────────────────────────── */}
         <motion.div
@@ -147,7 +149,7 @@ export function Navbar({ lang, dict, user }: NavbarProps) {
                     key={link.href}
                     href={link.href}
                     className={`relative px-4 py-2 rounded-xl text-sm font-medium transition-colors duration-200 flex items-center gap-2 ${
-                      isActive ? "text-neon-cyan" : "text-dark-muted hover:text-dark-text"
+                      isActive ? "text-neon-cyan" : "text-white/80 hover:text-white"
                     }`}
                   >
                     <link.icon className="w-3.5 h-3.5" aria-hidden="true" />
@@ -172,7 +174,7 @@ export function Navbar({ lang, dict, user }: NavbarProps) {
                 disabled={isPendingLang}
                 whileHover={{ scale: 1.08 }}
                 whileTap={{ scale: 0.92 }}
-                className="flex items-center justify-center font-bold text-[11px] w-8 h-8 rounded-full border border-dark-border text-dark-muted hover:text-neon-cyan hover:border-neon-cyan/50 transition-colors"
+                className="flex items-center justify-center font-bold text-[11px] w-8 h-8 rounded-full border border-dark-border text-white/80 hover:text-neon-cyan hover:border-neon-cyan/50 transition-colors bg-black/20"
                 aria-label={`Switch to ${lang === "ru" ? "English" : "Russian"}`}
               >
                 {isPendingLang
@@ -183,14 +185,14 @@ export function Navbar({ lang, dict, user }: NavbarProps) {
               {user ? (
                 <>
                   <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-                    <Link href="/profile" className="flex items-center gap-2 px-3 py-1.5 rounded-xl text-sm text-dark-muted hover:text-dark-text transition-colors">
+                    <Link href="/profile" className="flex items-center gap-2 px-3 py-1.5 rounded-xl text-sm text-white/80 hover:text-white transition-colors">
                       <User className="w-4 h-4" aria-hidden="true" />
                       <span className="max-w-[100px] truncate">{user.name || dict.profile}</span>
                     </Link>
                   </motion.div>
                   <form action={logoutAction}>
                     <motion.button type="submit" whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
-                      className="flex items-center gap-2 px-3 py-1.5 rounded-xl text-sm text-dark-muted hover:text-neon-pink transition-colors">
+                      className="flex items-center gap-2 px-3 py-1.5 rounded-xl text-sm text-white/80 hover:text-neon-pink transition-colors">
                       <LogOut className="w-4 h-4" aria-hidden="true" />
                       {dict.logout}
                     </motion.button>
@@ -209,8 +211,8 @@ export function Navbar({ lang, dict, user }: NavbarProps) {
             {/* Mobile hamburger */}
             <motion.button
               onClick={() => setMenuOpen((v) => !v)}
-              whileTap={{ scale: 0.88 }}
-              className="md:hidden p-2 rounded-xl text-dark-muted hover:text-dark-text hover:bg-dark-hover transition-colors"
+              animate={{ rotate: menuOpen ? 90 : 0 }}
+              className="md:hidden p-2 text-white/80 hover:text-white rounded-lg hover:bg-dark-hover transition-colors"
               aria-label={menuOpen ? "Close menu" : "Open menu"}
               aria-expanded={menuOpen}
             >

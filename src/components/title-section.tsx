@@ -115,9 +115,9 @@ export function TitleSection({ title, icon, titles, href }: TitleSectionProps) {
               exit={{ opacity: 0, scale: 0.85 }}
               transition={{ duration: 0.3 }}
               onClick={scrollPrev}
-              whileHover={{ scale: 1.12, backgroundColor: "rgba(0,240,255,1)", color: "#080810" }}
+              whileHover={{ scale: 1.12 }}
               whileTap={{ scale: 0.9 }}
-              className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 lg:-translate-x-5 z-10 p-2 rounded-full bg-dark-surface/90 backdrop-blur border border-dark-border text-white hidden md:flex shadow-xl shadow-black/60 group-hover:opacity-100 transition-colors"
+              className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 lg:-translate-x-5 z-10 p-2 rounded-full bg-dark-surface/90 backdrop-blur border border-dark-border text-white hidden md:flex shadow-xl shadow-black/60 group-hover:opacity-100 hover:bg-neon-cyan hover:text-dark-bg hover:border-neon-cyan transition-colors"
               aria-label="Scroll left"
             >
               <ChevronLeft className="w-5 h-5" />
@@ -150,9 +150,9 @@ export function TitleSection({ title, icon, titles, href }: TitleSectionProps) {
               exit={{ opacity: 0, scale: 0.85 }}
               transition={{ duration: 0.3 }}
               onClick={scrollNext}
-              whileHover={{ scale: 1.12, backgroundColor: "rgba(0,240,255,1)", color: "#080810" }}
+              whileHover={{ scale: 1.12 }}
               whileTap={{ scale: 0.9 }}
-              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 lg:translate-x-5 z-10 p-2 rounded-full bg-dark-surface/90 backdrop-blur border border-dark-border text-white hidden md:flex shadow-xl shadow-black/60 group-hover:opacity-100 transition-colors"
+              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 lg:translate-x-5 z-10 p-2 rounded-full bg-dark-surface/90 backdrop-blur border border-dark-border text-white hidden md:flex shadow-xl shadow-black/60 group-hover:opacity-100 hover:bg-neon-cyan hover:text-dark-bg hover:border-neon-cyan transition-colors"
               aria-label="Scroll right"
             >
               <ChevronRight className="w-5 h-5" />
