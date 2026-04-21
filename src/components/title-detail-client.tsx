@@ -207,10 +207,12 @@ export function TitleDetailClient({
                 </span>
               </div>
               <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold font-heading text-white leading-tight">
-                {title.name}
+                {dict.lang === "en" ? (title.nameEn || title.name) : title.name}
               </h1>
-              {title.nameEn && (
-                <p className="text-lg text-dark-muted mt-1">{title.nameEn}</p>
+              {(dict.lang === "en" ? title.nameEn && title.name : title.nameEn) && (
+                <p className="text-lg text-dark-muted mt-1">
+                  {dict.lang === "en" ? title.name : title.nameEn}
+                </p>
               )}
             </div>
 

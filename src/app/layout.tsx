@@ -11,7 +11,7 @@ import { DictionaryProvider } from "@/components/dictionary-provider";
 import { BackgroundEffects } from "@/components/background-effects";
 import { Toaster } from "react-hot-toast";
 
-const inter = Inter({ subsets: ["latin", "cyrillic"], variable: "--font-inter" });
+const inter = Inter({ subsets: ["latin", "cyrillic"], variable: "--font-inter", adjustFontFallback: false });
 const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -51,7 +51,7 @@ export default async function RootLayout({
 
   return (
     <html lang={lang} className="dark" data-scroll-behavior="smooth" suppressHydrationWarning>
-      <body className={`${inter.variable} ${outfit.variable} font-sans antialiased bg-dark-bg min-h-screen relative`} suppressHydrationWarning>
+      <body className={`${inter.variable} ${outfit.variable} font-sans antialiased min-h-screen relative`} suppressHydrationWarning>
         <BackgroundEffects />
         <DictionaryProvider dict={dict}>
           <Navbar lang={lang} dict={dict.nav} user={navUser} />

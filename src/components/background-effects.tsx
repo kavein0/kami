@@ -10,71 +10,54 @@ type DustParticle = {
 };
 
 export function BackgroundEffects() {
-  const particles: DustParticle[] = Array.from({ length: 25 }, (_, i) => ({
-    left: `${(i * 17) % 100}%`,
+  const particles: DustParticle[] = Array.from({ length: 60 }, (_, i) => ({
+    left: `${(i * 13) % 100}%`,
     top: `${(i * 29) % 100}%`,
-    duration: 15 + (i % 6) * 3,
-    delay: (i % 8) * 0.8,
+    duration: 15 + (i % 8) * 3,
+    delay: (i % 12) * 1.2,
   }));
 
+  // Premium organic animations (unused, removed spheres)
+  // const sphereVariants = { ... }
+
   return (
-    <div className="fixed inset-0 pointer-events-none -z-1 overflow-hidden bg-dark-bg">
-      {/* Grid Layer */}
-      <div className="absolute inset-0 bg-grid opacity-[0.08] [mask-image:radial-gradient(ellipse_at_center,black,transparent_80%)]" />
+    <>
+      {/* Noise grain overlay — pure CSS, no JS, zero perf cost */}
+      <div className="noise-overlay" aria-hidden="true" />
 
-      {/* Floating Mesh Blobs */}
-      <div className="absolute inset-0">
-        {/* Top Left - Cyan */}
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 0.25 }}
-          className="absolute -top-[15%] -left-[10%] w-[60%] h-[60%] rounded-full bg-neon-cyan blur-3xl-plus animate-drift"
-        />
-        
-        {/* Bottom Right - Pink */}
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 0.2 }}
-          className="absolute -bottom-[15%] -right-[10%] w-[60%] h-[60%] rounded-full bg-neon-pink blur-3xl-plus animate-drift-reverse"
+      <div className="fixed inset-0 pointer-events-none -z-10 overflow-hidden bg-dark-bg">
+        {/* Animated Gradient Background */}
+        <motion.div
+          className="absolute inset-0 opacity-20 bg-gradient-to-tr from-neon-pink via-neon-purple to-dark-bg mix-blend-screen"
+          animate={{
+            backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
+          }}
+          transition={{
+            duration: 15,
+            repeat: Infinity,
+            ease: "linear",
+          }}
+          style={{ backgroundSize: "200% 200%" }}
         />
 
-        {/* Middle Left - Purple */}
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 0.15 }}
-          className="absolute top-[30%] -left-[10%] w-[45%] h-[45%] rounded-full bg-neon-purple blur-3xl-plus animate-drift"
-          style={{ animationDelay: '-10s' }}
-        />
-      </div>
+        {/* Grid */}
+        <div className="absolute inset-0 bg-grid opacity-[0.06] [mask-image:radial-gradient(ellipse_80%_80%_at_50%_50%,black,transparent)]" />
 
-      {/* Subtle Floating Dust Particles */}
-      <div className="absolute inset-0">
-        {particles.map((particle, i) => (
+        {/* Subtle floating dust particles */}
+        {particles.map((p, i) => (
           <motion.div
             key={i}
-            className="absolute w-1 h-1 rounded-full bg-white/40 shadow-[0_0_8px_rgba(255,255,255,0.5)]"
-            style={{
-              left: particle.left,
-              top: particle.top,
-            }}
-            animate={{
-              y: [0, -150, 0],
-              opacity: [0, 0.6, 0],
-              scale: [0, 1.2, 0],
-            }}
-            transition={{
-              duration: particle.duration,
-              repeat: Infinity,
-              ease: "linear",
-              delay: particle.delay,
-            }}
+            className="absolute w-px h-px rounded-full bg-white/70"
+            style={{ left: p.left, top: p.top }}
+            animate={{ y: [0, -150, 0], opacity: [0, 0.8, 0], scale: [0, 2, 0] }}
+            transition={{ duration: p.duration, repeat: Infinity, ease: "linear", delay: p.delay }}
           />
         ))}
-      </div>
 
-      {/* Edge vignette */}
-      <div className="absolute inset-0 bg-gradient-to-t from-dark-bg via-transparent to-dark-bg opacity-60" />
-      <div className="absolute inset-0 bg-gradient-to-r from-dark-bg via-transparent to-dark-bg opacity-40" />
-    </div>
+        {/* Edge vignette to ground the background */}
+        <div className="absolute inset-0 bg-gradient-to-t from-dark-bg via-transparent to-dark-bg opacity-70" />
+        <div className="absolute inset-0 bg-gradient-to-r from-dark-bg via-transparent to-dark-bg opacity-40" />
+      </div>
+    </>
   );
 }

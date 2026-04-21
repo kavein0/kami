@@ -7,20 +7,27 @@
   --color-neon-purple: #aa77ff;
   --color-neon-green: #00ff88;
   --color-neon-yellow: #ffaa00;
-  --color-dark-bg: #0a0a0f;
-  --color-dark-card: #12121a;
-  --color-dark-surface: #1a1a2e;
-  --color-dark-border: #2a2a3e;
-  --color-dark-hover: #22223a;
-  --color-dark-text: #e0e0ee;
-  --color-dark-muted: #8888aa;
+  --color-neon-blue: #0088ff;
+  --color-dark-bg: #080810;
+  --color-dark-card: #0e0e1a;
+  --color-dark-surface: #16162a;
+  --color-dark-border: #252540;
+  --color-dark-hover: #1e1e38;
+  --color-dark-text: #e4e4f0;
+  --color-dark-muted: #7070a0;
   
   --font-sans: var(--font-inter), system-ui, sans-serif;
   --font-heading: var(--font-outfit), system-ui, sans-serif;
 }
 
 @layer base {
+  html {
+    font-size: 16px !important;
+    text-size-adjust: 100% !important;
+    -webkit-text-size-adjust: 100% !important;
+  }
   h1, h2, h3, h4, h5, h6 {
+    font-size: 1rem; /* default to 1rem base, though tailwind text- utilities override this anyway */
     font-family: var(--font-heading);
     letter-spacing: -0.02em;
   }
@@ -42,57 +49,118 @@ body {
   overflow-x: hidden;
 }
 
-/* Scrollbar */
+/* ============================================================
+   SCROLLBAR — premium thin neon line
+   ============================================================ */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 4px;
+  height: 4px;
 }
-
 ::-webkit-scrollbar-track {
-  background: var(--color-dark-bg);
+  background: transparent;
 }
-
 ::-webkit-scrollbar-thumb {
-  background: var(--color-dark-border);
-  border-radius: 4px;
+  background: linear-gradient(180deg, var(--color-neon-cyan), var(--color-neon-purple));
+  border-radius: 99px;
 }
-
 ::-webkit-scrollbar-thumb:hover {
   background: var(--color-neon-cyan);
 }
 
-/* Neon glow effects */
-.neon-glow-cyan {
-  box-shadow: 0 0 15px rgba(0, 240, 255, 0.3), 0 0 30px rgba(0, 240, 255, 0.1);
-}
-
-.neon-glow-pink {
-  box-shadow: 0 0 15px rgba(255, 0, 170, 0.3), 0 0 30px rgba(255, 0, 170, 0.1);
-}
-
-.neon-text-cyan {
-  text-shadow: 0 0 10px rgba(0, 240, 255, 0.5), 0 0 20px rgba(0, 240, 255, 0.3);
-}
-
-.neon-text-pink {
-  text-shadow: 0 0 10px rgba(255, 0, 170, 0.5), 0 0 20px rgba(255, 0, 170, 0.3);
-}
-
-/* Glassmorphism */
+/* ============================================================
+   GLASSMORPHISM SYSTEM
+   ============================================================ */
 .glass {
-  background: rgba(18, 18, 26, 0.7);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(14, 14, 26, 0.65);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .glass-strong {
-  background: rgba(18, 18, 26, 0.85);
-  backdrop-filter: blur(30px);
-  -webkit-backdrop-filter: blur(30px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(14, 14, 26, 0.88);
+  backdrop-filter: blur(40px) saturate(200%);
+  -webkit-backdrop-filter: blur(40px) saturate(200%);
+  border: 1px solid rgba(255, 255, 255, 0.09);
 }
 
-/* Card styles */
+/* ============================================================
+   SPOTLIGHT CARD — mouse-tracking radial gradient
+   Uses CSS custom properties set by SpotlightCard component.
+   ============================================================ */
+.spotlight-card {
+  position: relative;
+  isolation: isolate;
+}
+
+.spotlight-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 0;
+  background: radial-gradient(
+    600px circle at var(--mouse-x, -9999px) var(--mouse-y, -9999px),
+    var(--spotlight-color, rgba(0, 240, 255, 0.10)),
+    transparent 60%
+  );
+  transition: opacity 0.2s ease;
+}
+
+/* Border spotlight glow — more intense */
+.spotlight-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: -1;
+  background: radial-gradient(
+    300px circle at var(--mouse-x, -9999px) var(--mouse-y, -9999px),
+    rgba(0, 240, 255, 0.07),
+    transparent 70%
+  );
+}
+
+/* ============================================================
+   SHIMMER BORDER — for CTA buttons (21st.dev style)
+   ============================================================ */
+.shimmer-border {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.shimmer-border::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    130deg,
+    transparent 0%,
+    rgba(0, 240, 255, 0.8) 40%,
+    rgba(170, 119, 255, 0.8) 60%,
+    transparent 100%
+  );
+  background-size: 250% 250%;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: shimmer-rotate 3s linear infinite;
+  z-index: -1;
+}
+
+@keyframes shimmer-rotate {
+  0%   { background-position: 200% 50%; }
+  100% { background-position: -50% 50%; }
+}
+
+/* ============================================================
+   CARD SHINE — sweep-light effect on hover
+   ============================================================ */
 .card-shine {
   position: relative;
   overflow: hidden;
@@ -105,145 +173,219 @@ body {
   left: -100%;
   width: 50%;
   height: 100%;
-  background: linear-gradient(90deg,
-      transparent,
-      rgba(255, 255, 255, 0.03),
-      transparent);
-  transition: left 0.6s ease;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.04),
+    transparent
+  );
+  transition: left 0.7s cubic-bezier(0.22, 1, 0.36, 1);
   z-index: 1;
   pointer-events: none;
 }
 
 .card-shine:hover::before {
-  left: 100%;
+  left: 120%;
 }
 
-/* Hero gradient */
-.hero-gradient {
-  background: linear-gradient(135deg,
-      rgba(0, 240, 255, 0.1) 0%,
-      rgba(170, 119, 255, 0.05) 50%,
-      rgba(255, 0, 170, 0.1) 100%);
+/* ============================================================
+   NEON GLOW UTILITIES
+   ============================================================ */
+.neon-glow-cyan {
+  box-shadow:
+    0 0 10px rgba(0, 240, 255, 0.25),
+    0 0 30px rgba(0, 240, 255, 0.10),
+    0 0 60px rgba(0, 240, 255, 0.05);
+}
+.neon-glow-pink {
+  box-shadow:
+    0 0 10px rgba(255, 0, 170, 0.25),
+    0 0 30px rgba(255, 0, 170, 0.10);
+}
+.neon-glow-purple {
+  box-shadow:
+    0 0 10px rgba(170, 119, 255, 0.25),
+    0 0 30px rgba(170, 119, 255, 0.10);
 }
 
-/* Animated background */
+.neon-text-cyan {
+  text-shadow:
+    0 0 10px rgba(0, 240, 255, 0.6),
+    0 0 25px rgba(0, 240, 255, 0.3);
+}
+.neon-text-pink {
+  text-shadow:
+    0 0 10px rgba(255, 0, 170, 0.6),
+    0 0 25px rgba(255, 0, 170, 0.3);
+}
+
+/* ============================================================
+   BACKGROUND GRID
+   ============================================================ */
 .bg-grid {
-  background-image: linear-gradient(rgba(255, 255, 255, 0.02) 1px,
-      transparent 1px),
-    linear-gradient(90deg,
-      rgba(255, 255, 255, 0.02) 1px,
-      transparent 1px);
-  background-size: 60px 60px;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+  background-size: 48px 48px;
 }
 
-/* Input styles */
-input,
-textarea,
-select {
+/* Noise grain texture overlay */
+.noise-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 128px 128px;
+}
+
+/* ============================================================
+   INPUT / FORM STYLES
+   ============================================================ */
+input, textarea, select {
   font-family: "Inter", system-ui, sans-serif;
 }
 
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus {
-  -webkit-box-shadow: 0 0 0 1000px #12121a inset !important;
-  -webkit-text-fill-color: #e0e0ee !important;
-  border-color: #2a2a3e !important;
+  -webkit-box-shadow: 0 0 0 1000px #0e0e1a inset !important;
+  -webkit-text-fill-color: #e4e4f0 !important;
+  border-color: #252540 !important;
 }
 
-/* Animations */
-@keyframes float {
-
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-
-  50% {
-    transform: translateY(-10px);
-  }
-}
-
-@keyframes pulse-neon {
-
-  0%,
-  100% {
-    opacity: 1;
-  }
-
-  50% {
-    opacity: 0.5;
-  }
-}
-
-@keyframes shimmer {
-  0% {
-    background-position: -200% 0;
-  }
-
-  100% {
-    background-position: 200% 0;
-  }
-}
-
-.animate-float {
-  animation: float 3s ease-in-out infinite;
-}
-
-.animate-pulse-neon {
-  animation: pulse-neon 2s ease-in-out infinite;
-}
-
+/* ============================================================
+   SKELETON LOADING
+   ============================================================ */
 .skeleton {
-  background: linear-gradient(90deg,
-      var(--color-dark-surface) 25%,
-      var(--color-dark-border) 50%,
-      var(--color-dark-surface) 75%);
+  background: linear-gradient(
+    90deg,
+    var(--color-dark-surface) 25%,
+    var(--color-dark-border) 50%,
+    var(--color-dark-surface) 75%
+  );
   background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
+  animation: shimmer 1.8s infinite cubic-bezier(0.4, 0, 0.6, 1);
   border-radius: 8px;
 }
 
-/* Advanced Background Effects */
-.bg-mesh-gradient {
-  background-color: var(--color-dark-bg);
-  background-image: 
-    radial-gradient(at 0% 0%, rgba(0, 240, 255, 0.08) 0, transparent 50%),
-    radial-gradient(at 100% 0%, rgba(255, 0, 170, 0.08) 0, transparent 50%),
-    radial-gradient(at 50% 100%, rgba(170, 119, 255, 0.08) 0, transparent 50%);
+/* ============================================================
+   KEYFRAME ANIMATIONS
+   ============================================================ */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-12px); }
 }
 
+@keyframes pulse-neon {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.45; }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+
+/* Organic blob drift */
 @keyframes drift {
-  0% { transform: translate(0, 0) scale(1); }
-  33% { transform: translate(30px, -50px) scale(1.1); }
-  66% { transform: translate(-20px, 20px) scale(0.9); }
-  100% { transform: translate(0, 0) scale(1); }
+  0%   { transform: translate(0, 0) scale(1) rotate(0deg); }
+  25%  { transform: translate(40px, -60px) scale(1.05) rotate(5deg); }
+  50%  { transform: translate(-20px, 30px) scale(0.95) rotate(-3deg); }
+  75%  { transform: translate(30px, 60px) scale(1.08) rotate(4deg); }
+  100% { transform: translate(0, 0) scale(1) rotate(0deg); }
 }
 
 @keyframes drift-reverse {
-  0% { transform: translate(0, 0) scale(1); }
-  33% { transform: translate(-40px, 40px) scale(1.2); }
-  66% { transform: translate(20px, -30px) scale(0.8); }
-  100% { transform: translate(0, 0) scale(1); }
+  0%   { transform: translate(0, 0) scale(1) rotate(0deg); }
+  25%  { transform: translate(-50px, 40px) scale(1.1) rotate(-6deg); }
+  50%  { transform: translate(30px, -40px) scale(0.9) rotate(5deg); }
+  75%  { transform: translate(-20px, -60px) scale(1.05) rotate(-2deg); }
+  100% { transform: translate(0, 0) scale(1) rotate(0deg); }
 }
 
-.animate-drift {
-  animation: drift 20s ease-in-out infinite;
+/* ============================================================
+   ANIMATION CLASSES
+   ============================================================ */
+.animate-float        { animation: float 4s ease-in-out infinite; }
+.animate-pulse-neon   { animation: pulse-neon 2.5s ease-in-out infinite; }
+.animate-drift        { animation: drift 28s ease-in-out infinite; }
+.animate-drift-reverse { animation: drift-reverse 34s ease-in-out infinite; }
+
+/* Background mesh gradient */
+.bg-mesh-gradient {
+  background-color: var(--color-dark-bg);
+  background-image:
+    radial-gradient(at 0% 0%,   rgba(0, 240, 255, 0.07) 0, transparent 50%),
+    radial-gradient(at 100% 0%,  rgba(255, 0, 170, 0.07) 0, transparent 50%),
+    radial-gradient(at 50% 100%, rgba(170, 119, 255, 0.07) 0, transparent 50%);
 }
 
-.animate-drift-reverse {
-  animation: drift-reverse 25s ease-in-out infinite;
-}
+/* Blur classes */
+.blur-3xl-plus { filter: blur(100px); }
 
-.blur-3xl-plus {
-  filter: blur(120px);
-}
-
-/* Hide scrollbar for horizontal carousels */
-.hide-scrollbar::-webkit-scrollbar {
-  display: none;
-}
+/* ============================================================
+   SCROLL BAR HIDE (horizontal carousels)
+   ============================================================ */
+.hide-scrollbar::-webkit-scrollbar { display: none; }
 .hide-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* ============================================================
+   FLOATING NAV ISLAND
+   ============================================================ */
+.nav-island {
+  background: rgba(8, 8, 16, 0.75);
+  backdrop-filter: blur(30px) saturate(200%);
+  -webkit-backdrop-filter: blur(30px) saturate(200%);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(0, 240, 255, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* ============================================================
+   ACCESSIBILITY — respect prefers-reduced-motion
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .animate-drift,
+  .animate-drift-reverse,
+  .animate-float,
+  .animate-pulse-neon {
+    animation: none !important;
+  }
+}
+
+/* ============================================================
+   FIREFOX OPTIMIZATIONS (Performance)
+   Firefox struggles with massive SVG filters (noise), 
+   intense blurs (100px), and complex backdrop-filters.
+   ============================================================ */
+@-moz-document url-prefix() {
+  .noise-overlay {
+    /* SVG filters over 100vw/100vh kill Firefox framerate */
+    display: none !important;
+  }
+  
+  .glass {
+    backdrop-filter: blur(12px) !important;
+  }
+  
+  .glass-strong {
+    backdrop-filter: blur(20px) !important;
+  }
+  
+  .nav-island {
+    backdrop-filter: blur(16px) !important;
+  }
 }

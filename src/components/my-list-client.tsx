@@ -8,7 +8,7 @@ import { ListEntryData, ListStatus } from "@/lib/types";
 import { updateListEntry, removeFromList } from "@/app/actions/list";
 import { Star, MessageSquare, Trash2, Edit3, X, Save, LayoutGrid, List as ListIcon, Columns, Plus, Minus, Search, CheckSquare, Square } from "lucide-react";
 import type { Dictionary } from "@/lib/i18n";
-import { useDictionary } from "./dictionary-provider";
+
 
 type ViewMode = "kanban" | "grid" | "list";
 type ListDictionary = Dictionary["list"];
@@ -20,7 +20,7 @@ interface Props {
 }
 
 export function MyListClient({ entries: initialEntries, dict, lang }: Props) {
-  const fullDict = useDictionary();
+
   const COLUMNS = [
     { id: "watching", title: dict.watching, color: "border-neon-cyan/50 text-neon-cyan" },
     { id: "plan_to_watch", title: dict.planned, color: "border-neon-yellow/50 text-neon-yellow" },
@@ -52,7 +52,7 @@ export function MyListClient({ entries: initialEntries, dict, lang }: Props) {
       if (grouped[e.status]) grouped[e.status].push(e);
     });
     return grouped;
-  }, [entries, searchQuery]);
+  }, [entries, searchQuery, lang]);
 
   // General filtered entries for Grid/List
   const filteredEntries = useMemo(() => {
@@ -261,8 +261,8 @@ export function MyListClient({ entries: initialEntries, dict, lang }: Props) {
                       <div
                         {...provided.droppableProps}
                         ref={provided.innerRef}
-                        className={`flex-1 min-w-[280px] lg:min-w-[300px] snap-center rounded-3xl glass-strong border ${
-                          snapshot.isDraggingOver ? "bg-white/5 border-white/20" : "border-dark-border"
+                        className={`flex-1 min-w-[280px] lg:min-w-[300px] snap-center rounded-3xl border ${
+                          snapshot.isDraggingOver ? "bg-white/5 border-white/20" : "bg-dark-surface/80 border-dark-border"
                         } p-4 flex flex-col min-h-[65vh]`}
                       >
                         <div className="mb-4 flex items-center gap-2">
@@ -469,8 +469,8 @@ function EntryCardContent({
                 {entry.title.type === "movie" ? (dict.typeMovie || "Movie") : entry.title.type === "series" ? (dict.typeSeries || "Series") : (dict.typeAnime || "Anime")}
               </span>
               {showStatusBadge && (
-                <span className="text-[10px] px-1.5 py-0.5 rounded bg-dark-border text-dark-muted lowercase">
-                  {entry.status.replace("_", " ")}
+                <span className="text-[10px] px-1.5 py-0.5 rounded bg-dark-border text-dark-muted">
+                  {dict[entry.status === 'plan_to_watch' ? 'planned' : entry.status === 'on_hold' ? 'onHold' : entry.status as keyof typeof dict] || entry.status.replace("_", " ")}
                 </span>
               )}
             </div>

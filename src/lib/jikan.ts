@@ -245,6 +245,7 @@ async function fetchKitsuTotalCount(options: { search?: string, genre?: string }
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function normalizeShikimoriGraphQLTitle(item: any, lang: "ru" | "en"): TitleData {
   const malId = item.myanimelist_id ?? parseInt(item.id);
   const poster =
@@ -268,7 +269,7 @@ function normalizeShikimoriGraphQLTitle(item: any, lang: "ru" | "en"): TitleData
     episodes: item.episodes || null,
     duration: item.duration ? `${item.duration} min` : null,
     studio: item.studios?.[0]?.name || null,
-    genres: (item.genres || []).map((genre: any) => genre.name).join(", "),
+    genres: (item.genres || []).map((genre: { name: string }) => genre.name).join(", "),
     status: normalizeShikimoriStatus(item.status),
     popularity: 0,
   };
@@ -313,7 +314,7 @@ function normalizeShikimoriTitle(item: ShikimoriAnime, lang: "ru" | "en"): Title
   };
 }
 
-async function fetchShikimoriGraphQL<T>(query: string, variables: Record<string, any> = {}): Promise<T | null> {
+async function fetchShikimoriGraphQL<T>(query: string, variables: Record<string, unknown> = {}): Promise<T | null> {
   try {
     const res = await fetch(`${SHIKIMORI_BASE}/api/graphql`, {
       method: "POST",
@@ -538,6 +539,7 @@ async function fallbackSearchAnime(query: string, page: number): Promise<{ resul
     }
   `;
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const data = await fetchShikimoriGraphQL<{ animes: any[] }>(gql, { search: query, page });
   
   if (!data?.animes || data.animes.length === 0) {
@@ -560,7 +562,7 @@ async function fallbackPopularAnime(options: {
   sort?: "asc" | "desc";
 }): Promise<{ results: TitleData[]; totalResults: number }> {
   const lang = await getLanguage();
-  const { page = 1, genreId, sortBy = "members", sort = "desc" } = options;
+  const { page = 1, genreId, sortBy = "members" } = options;
 
   const order =
     sortBy === "score" ? "ranked" : 
@@ -586,6 +588,7 @@ async function fallbackPopularAnime(options: {
     }
   `;
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const data = await fetchShikimoriGraphQL<{ animes: any[] }>(gql, { 
     order, 
     page, 

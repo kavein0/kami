@@ -56,11 +56,11 @@ export function TitleListItem({ title, index }: Props) {
             <div className="flex items-start justify-between gap-2 mb-1">
               <div>
                 <h3 className="font-bold text-lg text-white group-hover:text-neon-cyan transition-colors line-clamp-1">
-                  {title.name}
+                  {dict.lang === "en" ? (title.nameEn || title.name) : title.name}
                 </h3>
-                {title.nameEn && (
+                {(dict.lang === "en" ? title.nameEn && title.name : title.nameEn) && (
                   <p className="text-xs text-dark-muted line-clamp-1 truncate uppercase tracking-tight">
-                    {title.nameEn}
+                    {dict.lang === "en" ? title.name : title.nameEn}
                   </p>
                 )}
               </div>

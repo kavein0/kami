@@ -36,7 +36,7 @@ export default async function MyListPage() {
           <MyListClient 
             entries={JSON.parse(JSON.stringify(entries))} 
             dict={dict.list}
-            lang={(dict as any).lang}
+            lang={dict.lang}
           />
         </div>
       </div>
